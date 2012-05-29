@@ -9,19 +9,15 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace StronglyTypedResourceBuilderTests
-{
-	[TestFixture()]
-	public class StronglyTypedResourceBuilderCodeDomTest
-	{
-		
+namespace StronglyTypedResourceBuilderTests {
+	[TestFixture]
+	public class StronglyTypedResourceBuilderCodeDomTest {
 		CodeCompileUnit sampleCcu;
-		string[] unmatchables;
+		string [] unmatchables;
 		Dictionary<string,object> testResources;
 		
 		public static T Get<T> (string propertyName, CodeCompileUnit ccu) where T:CodeTypeMember
 		{
-			
 			foreach (CodeTypeMember ctm in  ccu.Namespaces [0].Types [0].Members) {
 				if (ctm.GetType () == typeof (T) && ctm.Name == propertyName)
 					return (T) ctm;
@@ -29,16 +25,16 @@ namespace StronglyTypedResourceBuilderTests
 			return null;
 		}
 		
-		[TestFixtureSetUp()]
+		[TestFixtureSetUp]
 		public void TestFixtureSetup ()
 		{
-			testResources = new Dictionary<string, object>();
+			testResources = new Dictionary<string, object> ();
 			
-			Bitmap bmp = new Bitmap (100,100);
+			Bitmap bmp = new Bitmap (100, 100);
 			MemoryStream wav = new MemoryStream (1000);
 			// generate icon
-			Bitmap icoBmp = new Bitmap (50,50);
-			Icon ico = Icon.FromHandle (icoBmp.GetHicon());
+			Bitmap icoBmp = new Bitmap (50, 50);
+			Icon ico = Icon.FromHandle (icoBmp.GetHicon ());
 			
 			DateTime dt = DateTime.Now;
 			
@@ -59,18 +55,17 @@ namespace StronglyTypedResourceBuilderTests
 			wav.Close();
 		}
 		
-		[Test()]
+		[Test]
 		public void GeneratedCodeNamespace ()
 		{
+			Assert.AreEqual ("TestNamespace", sampleCcu.Namespaces [0].Name);
 			
-			Assert.AreEqual ("TestNamespace",sampleCcu.Namespaces [0].Name);
-			
-			Assert.AreEqual (1,sampleCcu.ReferencedAssemblies.Count);
-			Assert.AreEqual ("System.dll",sampleCcu.ReferencedAssemblies [0]);
-			Assert.AreEqual ("System",sampleCcu.Namespaces [0].Imports [0].Namespace);
+			Assert.AreEqual (1, sampleCcu.ReferencedAssemblies.Count);
+			Assert.AreEqual ("System.dll", sampleCcu.ReferencedAssemblies [0]);
+			Assert.AreEqual ("System", sampleCcu.Namespaces [0].Imports [0].Namespace);
 		}
 		
-		[Test()]
+		[Test]
 		public void ClassNameAndAccess ()
 		{
 			CodeTypeDeclaration resType = sampleCcu.Namespaces [0].Types [0];
@@ -80,14 +75,14 @@ namespace StronglyTypedResourceBuilderTests
 			Assert.IsTrue (resType.TypeAttributes ==  TypeAttributes.NotPublic);
 		}
 		
-		[Test()]
+		[Test]
 		public void ClassAttributes ()
 		{
 			CodeTypeDeclaration resType = sampleCcu.Namespaces [0].Types [0];
-			//attributes
 			
+			//attributes
 			Assert.AreEqual (3,resType.CustomAttributes.Count);
-			Assert.AreEqual ("System.CodeDom.Compiler.GeneratedCodeAttribute", resType.CustomAttributes[0].Name);
+			Assert.AreEqual ("System.CodeDom.Compiler.GeneratedCodeAttribute", resType.CustomAttributes [0].Name);
 			Assert.AreEqual (2, resType.CustomAttributes [0].Arguments.Count);
 			
 			CodePrimitiveExpression cpe1 = (CodePrimitiveExpression) resType.CustomAttributes [0].Arguments [0].Value;
@@ -103,11 +98,10 @@ namespace StronglyTypedResourceBuilderTests
 			Assert.AreEqual (0, resType.CustomAttributes [2].Arguments.Count);
 		}
 		
-		[Test()]
+		[Test]
 		public void Constructor ()
 		{
-			
-			CodeMemberMethod ctor = Get<CodeConstructor> (".ctor",sampleCcu); //not checking for overloads
+			CodeMemberMethod ctor = Get<CodeConstructor> (".ctor", sampleCcu); //not checking for overloads
 			
 			Assert.IsNotNull (ctor);
 			//access modifier
@@ -125,14 +119,14 @@ namespace StronglyTypedResourceBuilderTests
 			Assert.AreEqual ("CA1811:AvoidUncalledPrivateCode", (string) cpe2.Value);
 		}
 		
-		[Test()]
+		[Test]
 		public void ResourceManField ()
 		{
 			CodeMemberField resourceMan = Get<CodeMemberField> ("resourceMan", sampleCcu);
 			
 			Assert.IsNotNull (resourceMan);
 			
-			Assert.AreEqual ("System.Resources.ResourceManager",resourceMan.Type.BaseType);
+			Assert.AreEqual ("System.Resources.ResourceManager", resourceMan.Type.BaseType);
 			//access modifier : outputs to private static but following settings found in .net tests
 			Assert.IsTrue (resourceMan.Attributes == (MemberAttributes.Abstract
 			                                          | MemberAttributes.Final
@@ -140,14 +134,14 @@ namespace StronglyTypedResourceBuilderTests
 			                                          | MemberAttributes.FamilyOrAssembly));			
 		}
 		
-		[Test()]
+		[Test]
 		public void ResourceCultureField ()
 		{
 			CodeMemberField resourceCulture = Get<CodeMemberField> ("resourceCulture", sampleCcu);
 			
 			Assert.IsNotNull (resourceCulture);
 			
-			Assert.AreEqual ("System.Globalization.CultureInfo",resourceCulture.Type.BaseType);
+			Assert.AreEqual ("System.Globalization.CultureInfo", resourceCulture.Type.BaseType);
 			//access modifier
 			Assert.IsTrue (resourceCulture.Attributes == (MemberAttributes.Abstract
 			                                          		| MemberAttributes.Final
@@ -155,7 +149,7 @@ namespace StronglyTypedResourceBuilderTests
 			                                          		| MemberAttributes.FamilyOrAssembly));
 		}
 		
-		[Test()]
+		[Test]
 		public void ResourceManagerProperty ()
 		{
 			CodeMemberProperty resourceManager = Get<CodeMemberProperty> ("ResourceManager", sampleCcu);
@@ -167,7 +161,7 @@ namespace StronglyTypedResourceBuilderTests
 			               								  | MemberAttributes.Final
 			                                              | MemberAttributes.Assembly));
 			// attributes
-			Assert.AreEqual (1,resourceManager.CustomAttributes.Count);
+			Assert.AreEqual (1, resourceManager.CustomAttributes.Count);
 			Assert.AreEqual ("System.ComponentModel.EditorBrowsableAttribute", resourceManager.CustomAttributes [0].Name);
 			Assert.AreEqual (1, resourceManager.CustomAttributes [0].Arguments.Count);
 			
@@ -175,19 +169,18 @@ namespace StronglyTypedResourceBuilderTests
 			
 			Assert.AreEqual ("Advanced", cfe1.FieldName);
 			Assert.AreEqual ("System.ComponentModel.EditorBrowsableState", 
-			                 	((CodeTypeReferenceExpression)cfe1.TargetObject).Type.BaseType);
+			                 ((CodeTypeReferenceExpression)cfe1.TargetObject).Type.BaseType);
 			
 			//getter
-			
 			Assert.IsInstanceOf<CodeConditionStatement> (resourceManager.GetStatements [0]); 
 			Assert.AreEqual (2, ((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements.Count);
 			
-			CodeVariableDeclarationStatement cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements[0]).TrueStatements[0]);
+			CodeVariableDeclarationStatement cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
 			
 			Assert.AreEqual ("System.Resources.ResourceManager",((CodeObjectCreateExpression)cvds.InitExpression).CreateType.BaseType);
-			Assert.AreEqual ("TestResourcesNamespace.TestRes",((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters[0]).Value);
+			Assert.AreEqual ("TestResourcesNamespace.TestRes",((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value);
 			
-			CodePropertyReferenceExpression cpre = (CodePropertyReferenceExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters[1];
+			CodePropertyReferenceExpression cpre = (CodePropertyReferenceExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [1];
 			
 			Assert.AreEqual ("Assembly" ,cpre.PropertyName);
 			Assert.AreEqual ("TestRes", ((CodeTypeOfExpression)cpre.TargetObject).Type.BaseType);
@@ -198,7 +191,7 @@ namespace StronglyTypedResourceBuilderTests
 			
 		}
 		
-		[Test()]
+		[Test]
 		public void CultureProperty ()
 		{
 			CodeMemberProperty culture = Get<CodeMemberProperty> ("Culture", sampleCcu);
@@ -225,18 +218,16 @@ namespace StronglyTypedResourceBuilderTests
 			
 			// setter
 			Assert.AreEqual (1, culture.SetStatements.Count);
-			Assert.AreEqual("resourceCulture",((CodeFieldReferenceExpression)((CodeAssignStatement)culture.SetStatements[0]).Left).FieldName);
-			Assert.IsInstanceOf<CodePropertySetValueReferenceExpression> (((CodeAssignStatement)culture.SetStatements[0]).Right);
+			Assert.AreEqual("resourceCulture", ((CodeFieldReferenceExpression)((CodeAssignStatement)culture.SetStatements [0]).Left).FieldName);
+			Assert.IsInstanceOf<CodePropertySetValueReferenceExpression> (((CodeAssignStatement)culture.SetStatements [0]).Right);
 		}
 		
-		[Test()]
+		[Test]
 		public void ResourcePropertiesForStandard()
 		{
 			// property declares variable obj and set it to Object ResourceManager.GetObject(..)
 			// then returns obj cast back to its original type
-			
-			foreach ( KeyValuePair<string,object> kvp in testResources)
-			{
+			foreach ( KeyValuePair<string,object> kvp in testResources) {
 				if (kvp.Value is String || kvp.Value is Stream)
 					continue;
 				
@@ -244,66 +235,57 @@ namespace StronglyTypedResourceBuilderTests
 				
 				Assert.IsNotNull (cmp);
 								
-				Type thisType = kvp.Value.GetType();
+				Type thisType = kvp.Value.GetType ();
 				
 				// property type
 				Assert.AreEqual (thisType.FullName,cmp.Type.BaseType);
 				
-				CodeVariableDeclarationStatement cvds = (CodeVariableDeclarationStatement)cmp.GetStatements[0];
+				CodeVariableDeclarationStatement cvds = (CodeVariableDeclarationStatement)cmp.GetStatements [0];
 				
-				Assert.AreEqual ("obj",cvds.Name);
-				Assert.AreEqual ("GetObject",((CodeMethodInvokeExpression)cvds.InitExpression).Method.MethodName);
+				Assert.AreEqual ("obj", cvds.Name);
+				Assert.AreEqual ("GetObject", ((CodeMethodInvokeExpression)cvds.InitExpression).Method.MethodName);
 				
 				CodeMethodInvokeExpression cmie = ((CodeMethodInvokeExpression)cvds.InitExpression);
 				
-				Assert.AreEqual ("ResourceManager",((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
-				Assert.AreEqual (kvp.Key,((CodePrimitiveExpression)cmie.Parameters[0]).Value);
-				Assert.AreEqual ("resourceCulture",((CodeFieldReferenceExpression)cmie.Parameters[1]).FieldName);
+				Assert.AreEqual ("ResourceManager", ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
+				Assert.AreEqual (kvp.Key, ((CodePrimitiveExpression)cmie.Parameters [0]).Value);
+				Assert.AreEqual ("resourceCulture", ((CodeFieldReferenceExpression)cmie.Parameters [1]).FieldName);
 				
-				CodeCastExpression cce = ((CodeCastExpression)((CodeMethodReturnStatement)cmp.GetStatements[1]).Expression);
+				CodeCastExpression cce = ((CodeCastExpression)((CodeMethodReturnStatement)cmp.GetStatements [1]).Expression);
 				
-				Assert.AreEqual (thisType.FullName,((CodeTypeReference)cce.TargetType).BaseType);
-				Assert.AreEqual ("obj",((CodeVariableReferenceExpression)cce.Expression).VariableName);
+				Assert.AreEqual (thisType.FullName, ((CodeTypeReference)cce.TargetType).BaseType);
+				Assert.AreEqual ("obj", ((CodeVariableReferenceExpression)cce.Expression).VariableName);
 			}
 		}
 		
-		[Test()]
+		[Test]
 		public void ResourcePropertyForStrings ()
 		{
 			// property returns string ResourceManager.GetString(..) 
-			
-			foreach ( KeyValuePair<string,object> kvp in testResources)
-			{
-				
+			foreach ( KeyValuePair<string,object> kvp in testResources) {
 				if (!(kvp.Value is String))
 					continue;
 				
 				CodeMemberProperty cmp = Get<CodeMemberProperty> (kvp.Key, sampleCcu);
 				
 				Assert.IsNotNull (cmp);
-				Assert.AreEqual ("System.String",cmp.Type.BaseType);
+				Assert.AreEqual ("System.String", cmp.Type.BaseType);
 				
-				Assert.IsInstanceOf<CodeMethodReturnStatement> (cmp.GetStatements[0]);
+				Assert.IsInstanceOf<CodeMethodReturnStatement> (cmp.GetStatements [0]);
 				
-				CodeMethodInvokeExpression cmie = ((CodeMethodInvokeExpression)((CodeMethodReturnStatement)cmp.GetStatements[0]).Expression);
+				CodeMethodInvokeExpression cmie = ((CodeMethodInvokeExpression)((CodeMethodReturnStatement)cmp.GetStatements [0]).Expression);
 				
 				Assert.AreEqual ("GetString",cmie.Method.MethodName);
 				Assert.AreEqual (kvp.Key,((CodePrimitiveExpression)cmie.Parameters[0]).Value);
 				Assert.AreEqual ("ResourceManager", ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
-
-				
 			}
 		}
 		
-		[Test()]
+		[Test]
 		public void ResourcePropertyForStreams () 
 		{
-			
-			// property returns UnmanagedMemoryStream ResourceManager.GetStream(..)
-						
-			foreach ( KeyValuePair<string,object> kvp in testResources)
-			{
-				
+			// property returns UnmanagedMemoryStream ResourceManager.GetStream(..)		
+			foreach ( KeyValuePair<string,object> kvp in testResources) {
 				if (!(kvp.Value is Stream))
 					continue;
 				
@@ -312,13 +294,12 @@ namespace StronglyTypedResourceBuilderTests
 				Assert.IsNotNull (cmp);
 				Assert.AreEqual ("System.IO.UnmanagedMemoryStream",cmp.Type.BaseType);
 				
-				CodeMethodInvokeExpression cmie = ((CodeMethodInvokeExpression)((CodeMethodReturnStatement)cmp.GetStatements[0]).Expression);
+				CodeMethodInvokeExpression cmie = ((CodeMethodInvokeExpression)((CodeMethodReturnStatement)cmp.GetStatements [0]).Expression);
 				
-				Assert.AreEqual ("GetStream",cmie.Method.MethodName);
-				Assert.AreEqual (kvp.Key,((CodePrimitiveExpression)cmie.Parameters[0]).Value);
+				Assert.AreEqual ("GetStream", cmie.Method.MethodName);
+				Assert.AreEqual (kvp.Key, ((CodePrimitiveExpression)cmie.Parameters[0]).Value);
 				Assert.AreEqual ("ResourceManager", ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
 			}
 		}
-		
 	}
 }

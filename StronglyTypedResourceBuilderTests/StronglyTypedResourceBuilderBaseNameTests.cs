@@ -4,16 +4,11 @@ using System.Resources.Tools;
 using System.CodeDom;
 using Microsoft.CSharp;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Drawing;
 
-namespace StronglyTypedResourceBuilderTests
-{
-	[TestFixture()]
-	public class StronglyTypedResourceBuilderBaseNameTests
-	{
-		static string[] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
+namespace StronglyTypedResourceBuilderTests {
+	[TestFixture]
+	public class StronglyTypedResourceBuilderBaseNameTests	{
+		static string [] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
 									"checked", "class", "const", "continue", "decimal", "default", "delegate", 
 									"do", "double", "else", "enum", "event", "explicit", "extern", "FALSE", 
 									"false", "finally", "fixed", "float", "for", "foreach", "goto", "if", 
@@ -23,25 +18,28 @@ namespace StronglyTypedResourceBuilderTests
 									"short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", 
 									"throw", "TRUE", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", 
 									"ushort", "using", "virtual", "volatile", "void", "while" };
-		
-		static char[] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
+		static char [] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
 									'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
 									'}', '\"', '\'', ':', '!'};
+		CSharpCodeProvider provider = new CSharpCodeProvider ();
+		Dictionary<string, object> testResources;
 		
-		[Test ()]
+		[SetUp]
+		public void Setup ()
+		{
+			testResources = new Dictionary<string, object> ();
+			testResources.Add ("akey", String.Empty);
+		}
+		
+		[Test]
 		public void BaseNameEmpty ()
 		{
 			// empty class name should change to _
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			string input, expected;
 			
-			testResources.Add ("akey", "");    		 
-			
-			input = "";
+			input = String.Empty;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
 			                                            input,
@@ -53,59 +51,37 @@ namespace StronglyTypedResourceBuilderTests
 			
 			expected = "_";
 			
-			Assert.AreEqual (expected,ccu.Namespaces[0].Types[0].Name);
+			Assert.AreEqual (expected,ccu.Namespaces [0].Types [0].Name);
 		}
 		
-		[Test ()]
+		[Test, ExpectedException (typeof (ArgumentException))]
 		public void BaseNameInvalidIdentifier ()
 		{
 			// identifier invalid after Going through provider.CreateValidIdentifier throw exception in .NET framework
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
-			bool exceptionRaised = false;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			string input;
-			
-			testResources.Add ("akey", "");    		 
 			
 			input = "cla$ss";
 			
-			try {
-			
-				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            input,
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
-			} catch (Exception ex) {
-				exceptionRaised = true;
-				Assert.IsInstanceOf<ArgumentException> (ex);
-			}
-			finally {
-				Assert.IsTrue (exceptionRaised,"An exception is expected here");
-			}
+			ccu = StronglyTypedResourceBuilder.Create (testResources,
+			                                            input,
+			                                            "TestNamespace",
+			                                            "TestResourcesNameSpace",
+			         									provider,
+			                                            true,
+			                                            out unmatchables);
 		}
 		
-		[Test()]
+		[Test]
 		public void BaseNameKeywords ()
 		{
 			// provider.CreateValidIdentifier used to return valid identifier
-			
 			string expected;
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object> ();
-			string[] unmatchables;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
-			
-			testResources.Add ("akey", "");    		 
 			
 			foreach (string input in keywords) {
-				
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
 				                                            input,
 				                                            "TestNamespace",
@@ -114,61 +90,40 @@ namespace StronglyTypedResourceBuilderTests
 				                                            true,
 				                                            out unmatchables);
 				
-				expected = provider.CreateValidIdentifier(input);
+				expected = provider.CreateValidIdentifier (input);
 				
-				Assert.AreEqual (expected,ccu.Namespaces[0].Types[0].Name);
+				Assert.AreEqual (expected,ccu.Namespaces [0].Types [0].Name);
 			}
 		}
 		
-		[Test ()]
+		[Test, ExpectedException (typeof (ArgumentNullException))]
 		public void BaseNameNull ()
 		{
 			// should throw exception
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
-			bool exceptionRaised = false;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
-			
 			string input;
-			
-			testResources.Add ("akey", "");    		 
 			
 			input = null;
 			
-			try {
-				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            input,
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
-			} catch (Exception ex) {
-				exceptionRaised = true;
-				Assert.IsInstanceOf<ArgumentNullException> (ex);
-			}
-			finally {
-				Assert.IsTrue (exceptionRaised,"An exception is expected here");
-			}
+			ccu = StronglyTypedResourceBuilder.Create (testResources,
+			                                            input,
+			                                            "TestNamespace",
+			                                            "TestResourcesNameSpace",
+			         									provider,
+			                                            true,
+			                                            out unmatchables);
 		}
 		
-		[Test ()]
+		[Test]
 		public void BaseNameSpecialChars ()
 		{
 			// provider.CreateValidIdentifier used
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			string input, expected;
-			
-			testResources.Add ("akey", "");    		 
-			
+
 			foreach (char c in specialChars) {
-				
 				input = c.ToString ();
 				
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
@@ -181,7 +136,7 @@ namespace StronglyTypedResourceBuilderTests
 				
 				expected = StronglyTypedResourceBuilder.VerifyResourceName(input, provider);
 				
-				Assert.AreEqual (expected,ccu.Namespaces[0].Types[0].Name);
+				Assert.AreEqual (expected,ccu.Namespaces [0].Types [0].Name); 
 			}
 		}
 	}

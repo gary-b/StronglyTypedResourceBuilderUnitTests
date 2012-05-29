@@ -5,12 +5,10 @@ using System.CodeDom;
 using Microsoft.CSharp;
 using System.Collections.Generic;
 
-namespace StronglyTypedResourceBuilderTests
-{
-	[TestFixture()]
-	public class StronglyTypedResourceBuilderNamespaceTests
-	{
-		static string[] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
+namespace StronglyTypedResourceBuilderTests {
+	[TestFixture]
+	public class StronglyTypedResourceBuilderNamespaceTests	{
+		static string [] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
 									"checked", "class", "const", "continue", "decimal", "default", "delegate", 
 									"do", "double", "else", "enum", "event", "explicit", "extern", "FALSE", 
 									"false", "finally", "fixed", "float", "for", "foreach", "goto", "if", 
@@ -20,30 +18,30 @@ namespace StronglyTypedResourceBuilderTests
 									"short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", 
 									"throw", "TRUE", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", 
 									"ushort", "using", "virtual", "volatile", "void", "while" };
-		
-		static char[] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
+		static char [] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
 									'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
 									'}', '\"', '\'', ':', '!'};
+		CSharpCodeProvider provider = new CSharpCodeProvider ();
+		Dictionary<string, object> testResources;
 		
+		[SetUp]
+		public void Setup ()
+		{
+			testResources = new Dictionary<string, object> ();
+			testResources.Add ("akey", String.Empty);
+		}
 		
-		[Test ()]
+		[Test]
 		public void GeneratedCodeNamespaceEmpty ()
 		{
-			
 			// empty namespace allowed
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			string input, expected;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeCompileUnit ccu;
 			
-			input = "";
+			input = String.Empty;
 			
-			expected = "";
+			expected = String.Empty;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
 			                                            "TestClass",
@@ -53,27 +51,20 @@ namespace StronglyTypedResourceBuilderTests
 			                                            true,
 			                                            out unmatchables);
 			
-			Assert.AreEqual (expected,ccu.Namespaces[0].Name);
+			Assert.AreEqual (expected,ccu.Namespaces [0].Name);
 		}
 		
-		[Test ()]
+		[Test]
 		public void GeneratedCodeNamespaceNull ()
 		{
-			
-			// null should be replaced with ""
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			// null should be replaced with String.Empty
+			string [] unmatchables;
 			string input, expected;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeCompileUnit ccu;
 			
 			input = null;
 			
-			expected = "";
+			expected = String.Empty;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
 			                                            "TestClass",
@@ -83,21 +74,15 @@ namespace StronglyTypedResourceBuilderTests
 			                                            true,
 			                                            out unmatchables);
 			
-			Assert.AreEqual (expected,ccu.Namespaces[0].Name);
+			Assert.AreEqual (expected,ccu.Namespaces [0].Name);
 		}
 		
-		[Test ()]
+		[Test]
 		public void GeneratedCodeNamespaceProviderInvalidIdentifiersOK ()
 		{
 			// identifiers which are still invalid after CreateValidIdentifier called allowed through in .NET framework
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			string input, output, expected;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeCompileUnit ccu;
 			
 			input = "te$st";
@@ -111,26 +96,19 @@ namespace StronglyTypedResourceBuilderTests
 			                                            true,
 			                                            out unmatchables);
 			
-			output = ccu.Namespaces[0].Name;
+			output = ccu.Namespaces [0].Name;
 			
 			Assert.AreEqual (expected,output);
 		}
 		
-		[Test()]
+		[Test]
 		public void GeneratedCodeNamespaceProviderKeywords ()
 		{
 			string expected;
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
-			
+
 			foreach (string input in keywords) {
-			
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
 				                                            "TestClass",
 				                                            input,
@@ -139,26 +117,19 @@ namespace StronglyTypedResourceBuilderTests
 				                                            true,
 				                                            out unmatchables);
 				
-				expected = provider.CreateValidIdentifier(input);
+				expected = provider.CreateValidIdentifier (input);
 				
-				Assert.AreEqual (expected,ccu.Namespaces[0].Name);
+				Assert.AreEqual (expected,ccu.Namespaces [0].Name);
 			}
 		}
 		
-		[Test()]
+		[Test]
 		public void GeneratedCodeNamespaceProviderKeywordsMultipart ()
 		{
 			// .NET framework does not check individiual elements of multipart namespace
-			
 			string expected, input;
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			
 			foreach (string word in keywords) {
 				
@@ -172,34 +143,28 @@ namespace StronglyTypedResourceBuilderTests
 				                                            true,
 				                                            out unmatchables);
 				
-				expected = provider.CreateValidIdentifier(input);
+				expected = provider.CreateValidIdentifier (input);
 				
-				Assert.AreEqual (expected,ccu.Namespaces[0].Name);
+				Assert.AreEqual (expected,ccu.Namespaces [0].Name);
 			}
 		}
 		
-		[Test ()]
+		[Test]
 		public void GeneratedCodeNamespaceSpecialChars ()
 		{
 			// invalid chars replaced with _ noting (. and :) are allowed by .NET framework
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			string input, output, expected;
 			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeCompileUnit ccu;
 			
 			foreach (char c in specialChars) {
-				
 				input = "test" + c.ToString ();
 				
 				if (c == '.' || c == ':')
 					expected = input;
 				else
-					expected = StronglyTypedResourceBuilder.VerifyResourceName(input,provider);
+					expected = StronglyTypedResourceBuilder.VerifyResourceName(input, provider);
 			
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
 				                                            "TestClass",
@@ -209,30 +174,23 @@ namespace StronglyTypedResourceBuilderTests
 				                                            true,
 				                                            out unmatchables);
 				
-				output = ccu.Namespaces[0].Name;
+				output = ccu.Namespaces [0].Name;
 				
 				Assert.AreEqual (expected,output);
 			}
 		}
 		
-		[Test ()]
+		[Test]
 		public void ResourcesNamespaceEmpty ()
 		{
-			
 			// when ResourcesNamespace is String.Empty no namespace is used
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			string input, output, expected;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeCompileUnit ccu;
 			CodeMemberProperty resourceManager;
 			CodeVariableDeclarationStatement cvds;
 			
-			input = "";
+			input = String.Empty;
 			
 			expected = "TestClass";
 			
@@ -245,25 +203,18 @@ namespace StronglyTypedResourceBuilderTests
 			                                            out unmatchables);
 			
 			resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
-			cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements[0]).TrueStatements[0]);
-			output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters[0]).Value.ToString ();
+			cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
+			output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 			
 			Assert.AreEqual (expected,output);
 		}
 		
-		[Test ()]
+		[Test]
 		public void ResourcesNamespaceNull ()
 		{
-			
 			// when ResourcesNamespace is null generatedCodeNamespace is used in its place
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
 			string[] unmatchables;
 			string input, output, expected;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeCompileUnit ccu;
 			CodeMemberProperty resourceManager;
 			CodeVariableDeclarationStatement cvds;
@@ -281,31 +232,23 @@ namespace StronglyTypedResourceBuilderTests
 			                                            out unmatchables);
 			
 			resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
-			cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements[0]).TrueStatements[0]);
-			output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters[0]).Value.ToString ();
+			cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
+			output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 			
 			Assert.AreEqual (expected,output);
 		}
 				
-		[Test()]
+		[Test]
 		public void ResourcesNamespaceProviderKeywords ()
 		{
 			// not validated against provider keywords in .net framework
-			
 			string output,expected;
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeMemberProperty resourceManager;
 			CodeVariableDeclarationStatement cvds;
 			
 			foreach (string input in keywords) {
-			
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
 				                                            "TestClass",
 				                                            "TestNamespace",
@@ -317,32 +260,24 @@ namespace StronglyTypedResourceBuilderTests
 				
 				expected = input + ".TestClass";
 				resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
-				cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements[0]).TrueStatements[0]);
-				output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters[0]).Value.ToString ();
+				cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
+				output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 				
 				Assert.AreEqual (expected,output);
 			}
 		}
 		
-		[Test ()]
+		[Test]
 		public void ResourcesNamespaceSpecialChars ()
 		{
-			
 			// ResourcesNamespace doesnt seem to be validated at all in .NET framework
-			
-			Dictionary<string, object> testResources = new Dictionary<string, object>();
-			string[] unmatchables;
+			string [] unmatchables;
 			string input, output, expected;
-			
-			testResources.Add ("akey", "");    		 
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			CodeCompileUnit ccu;
 			CodeMemberProperty resourceManager;
 			CodeVariableDeclarationStatement cvds;
 			
 			foreach (char c in specialChars) {
-				
 				input = "test" + c.ToString ();
 				
 				expected = input + ".TestClass";
@@ -356,15 +291,12 @@ namespace StronglyTypedResourceBuilderTests
 				                                            out unmatchables);
 				
 				resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
-				cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements[0]).TrueStatements[0]);
-				output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters[0]).Value.ToString ();
+				cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
+				output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 				
 				Assert.AreEqual (expected,output);
 			}
 		}
-		
-		
-		
 	}
 }
 

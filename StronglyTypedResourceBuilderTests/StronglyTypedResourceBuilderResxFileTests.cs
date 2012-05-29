@@ -1,62 +1,96 @@
 using NUnit.Framework;
 using System;
 using System.Resources.Tools;
-using System.CodeDom;
 using Microsoft.CSharp;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Drawing;
+using System.CodeDom;
 
-namespace StronglyTypedResourceBuilderTests
-{
-	
-	
-	[TestFixture()]
-	public class StronglyTypedResourceBuilderResxFileTests
-	{
-				
-		[Test()]
+namespace StronglyTypedResourceBuilderTests {
+	[TestFixture]
+	public class StronglyTypedResourceBuilderResxFileTests 	{	
+		CSharpCodeProvider provider = new CSharpCodeProvider ();
+		
+		[Test, ExpectedException (typeof (ArgumentException))]
+		public void ResXFilenameEmpty ()
+		{
+			// in .NET framework throws exception
+			string [] unmatchables;
+			CodeCompileUnit ccu;
+			
+			string resx = String.Empty;
+			
+			ccu = StronglyTypedResourceBuilder.Create (resx,
+			                                            "TestRes",
+			                                            "TestNamespace",
+			                                            "TestResourcesNameSpace",
+			         									provider,
+			                                            true,
+			                                            out unmatchables);
+		}
+		
+		[Test, ExpectedException (typeof (ArgumentException))]
+		public void ResXFilenameInvalid ()
+		{
+			// in .NET framework throws exception
+			string [] unmatchables;
+			CodeCompileUnit ccu;
+			
+			string resx = @"C::::\\\\Hello/World";
+			
+			ccu = StronglyTypedResourceBuilder.Create (resx,
+			                                            "TestRes",
+			                                            "TestNamespace",
+			                                            "TestResourcesNameSpace",
+			         									provider,
+			                                            true,
+			                                            out unmatchables);
+		}
+		
+		[Test, ExpectedException (typeof (ArgumentNullException))]
+		public void ResXFilenameNull ()
+		{
+			//should throw exception
+			string [] unmatchables;
+			CodeCompileUnit ccu;
+			
+			string resx = null;
+			
+			ccu = StronglyTypedResourceBuilder.Create (resx,
+			                                            "TestRes",
+			                                            "TestNamespace",
+			                                            "TestResourcesNameSpace",
+			         									provider,
+			                                            true,
+			                                            out unmatchables);
+		}
+		
+		[Test, ExpectedException (typeof (FileNotFoundException))]
 		public void ResXFileNotFound ()
 		{
 			// not documented on msdn but throws FileNotFoundException
-			
-			string[] unmatchables;
-			bool exceptionRaised = false;
+			string [] unmatchables;
 			CodeCompileUnit ccu;
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			
 			//get a valid new filename and then make it not exist
-			string resx = Path.GetTempFileName();
+			string resx = Path.GetTempFileName ();
 			File.Delete (resx);
 			
-			try {
-				ccu = StronglyTypedResourceBuilder.Create (resx,
-				                                            "TestRes",
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
-			} catch (Exception ex) {
-				exceptionRaised = true;
-				Assert.IsInstanceOf<FileNotFoundException> (ex);
-			} finally {
-				Assert.IsTrue (exceptionRaised);
-			}
+			ccu = StronglyTypedResourceBuilder.Create (resx,
+			                                            "TestRes",
+			                                            "TestNamespace",
+			                                            "TestResourcesNameSpace",
+			         									provider,
+			                                            true,
+			                                            out unmatchables);
 		}
 		
-		[Test()]
+		[Test]
 		public void ResXFileNotResx ()
 		{
-			//should throw exception
-			
-			string[] unmatchables;
+			//***should throw exception but Not using ExpectedException as i want to delete temp file***
+			string [] unmatchables;
 			bool exceptionRaised = false;
 			CodeCompileUnit ccu;
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			
 			string resx = Path.GetTempFileName();
 			
@@ -77,92 +111,6 @@ namespace StronglyTypedResourceBuilderTests
 			}
 		}
 		
-		[Test()]
-		public void ResXFilenameEmpty ()
-		{
-			// in .NET framework throws exception
-			
-			string[] unmatchables;
-			bool exceptionRaised = false;
-			CodeCompileUnit ccu;
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
-			
-			string resx = "";
-			
-			try {
-				ccu = StronglyTypedResourceBuilder.Create (resx,
-				                                            "TestRes",
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
-			} catch (Exception ex) {
-				exceptionRaised = true;
-				Assert.IsInstanceOf<ArgumentException> (ex);
-			} finally {
-				Assert.IsTrue (exceptionRaised);
-			}
-		}
-		
-		[Test()]
-		public void ResXFilenameInvalid ()
-		{
-			// in .NET framework throws exception
-			
-			string[] unmatchables;
-			bool exceptionRaised = false;
-			CodeCompileUnit ccu;
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
-			
-			string resx = @"C::::\\\\Hello/World";
-			
-			try {
-				ccu = StronglyTypedResourceBuilder.Create (resx,
-				                                            "TestRes",
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
-			} catch (Exception ex) {
-				exceptionRaised = true;
-				Assert.IsInstanceOf<ArgumentException> (ex);
-			} finally {
-				Assert.IsTrue (exceptionRaised);
-			}
-		}
-		
-		[Test()]
-		public void ResXFilenameNull ()
-		{
-			//should throw exception
-			
-			string[] unmatchables;
-			bool exceptionRaised = false;
-			CodeCompileUnit ccu;
-			
-			CSharpCodeProvider provider = new CSharpCodeProvider ();
-			
-			string resx = null;
-			
-			try {
-				ccu = StronglyTypedResourceBuilder.Create (resx,
-				                                            "TestRes",
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
-			} catch (Exception ex) {
-				exceptionRaised = true;
-				Assert.IsInstanceOf<ArgumentNullException> (ex);
-			} finally {
-				Assert.IsTrue (exceptionRaised);
-			}
-		}
 	}
 }
 

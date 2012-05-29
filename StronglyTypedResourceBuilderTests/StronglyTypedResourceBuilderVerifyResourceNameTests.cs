@@ -3,13 +3,10 @@ using System;
 using System.Resources.Tools;
 using Microsoft.CSharp;
 
-namespace StronglyTypedResourceBuilderTests
-{
-	[TestFixture()]
-	public class StronglyTypedResourceBuilderVerifyResourceNameTests
-	{
-		
-		static string[] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
+namespace StronglyTypedResourceBuilderTests {
+	[TestFixture]
+	public class StronglyTypedResourceBuilderVerifyResourceNameTests {
+		static string [] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
 									"checked", "class", "const", "continue", "decimal", "default", "delegate", 
 									"do", "double", "else", "enum", "event", "explicit", "extern", "FALSE", 
 									"false", "finally", "fixed", "float", "for", "foreach", "goto", "if", 
@@ -19,70 +16,60 @@ namespace StronglyTypedResourceBuilderTests
 									"short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", 
 									"throw", "TRUE", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", 
 									"ushort", "using", "virtual", "volatile", "void", "while" };
-		
-		static char[] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
+		static char [] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
 									'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
 									'}', '\"', '\'', ':', '!'};
+		CSharpCodeProvider provider = new CSharpCodeProvider();
 		
-		[Test()]
+		[Test]
 		public void VerifyResourceNameEmpty ()
 		{
 			// should return _
 			
-			string output = StronglyTypedResourceBuilder.VerifyResourceName ("", new CSharpCodeProvider ());
+			string output = StronglyTypedResourceBuilder.VerifyResourceName (string.Empty, provider);
 			
-			Assert.AreEqual ("_",output);
+			Assert.AreEqual ("_", output);
 		}
 		
-		[Test ()]
+		[Test]
 		public void VerifyResourceNameSpecialChars ()
 		{
 			// should replace with _
-			
 			string input, expected, output;
 			
-			foreach (char c in specialChars)
-			{
+			foreach (char c in specialChars) {
 				input 	 = string.Format ("{0}a{0}b{0}", c); 
 				expected = string.Format ("{0}a{0}b{0}", '_');
 				
-				output = StronglyTypedResourceBuilder.VerifyResourceName (input,new CSharpCodeProvider());
+				output = StronglyTypedResourceBuilder.VerifyResourceName (input, provider);
 				
-				Assert.AreEqual (expected,output);
+				Assert.AreEqual (expected, output);
 			}
 		}
 		
-		[Test ()]
+		[Test]
 		public void VerifyResourceNameProviderKeywords ()
 		{
 			// not complete list, doesnt really need to be
-						
 			string expected, output;
 			
-			foreach (string input in keywords)
-			{
-				CSharpCodeProvider provider = new CSharpCodeProvider();
+			foreach (string input in keywords) {
+				output = StronglyTypedResourceBuilder.VerifyResourceName (input, provider);
 				
-				output = StronglyTypedResourceBuilder.VerifyResourceName (input,provider);
+				expected = provider.CreateValidIdentifier (input);
 				
-				expected = provider.CreateValidIdentifier(input);
-				
-				Assert.AreEqual (expected,output);
+				Assert.AreEqual (expected, output);
 			}
 		}
 		
-		[Test ()]
-		public void VerifyResourceNameProviderInvalidIdentifiers ()
-		{
-			// function tests by means of provider.IsValidIdentifier after replaces special chars presumably and returns null
-			
+		[Test]
+		public void VerifyResourceNameProviderInvalidIdentifiers () {
+			// function tests by means of provider.IsValidIdentifier after replaces special chars presumably and returns null if true
 			string output;
 			
-			CSharpCodeProvider provider = new CSharpCodeProvider();
+			output = StronglyTypedResourceBuilder.VerifyResourceName ("tes$t", provider);
 			
-			output = StronglyTypedResourceBuilder.VerifyResourceName ("tes$t",provider);
-			
-			Assert.AreEqual (null,output);
+			Assert.AreEqual (null, output);
 		}
 	}
 }
