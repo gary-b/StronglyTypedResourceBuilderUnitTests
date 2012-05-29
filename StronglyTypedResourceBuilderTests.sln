@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StronglyTypedResourceBuilderTests", "StronglyTypedResourceBuilderTests\StronglyTypedResourceBuilderTests.csproj", "{CC1620A1-6253-43BA-B3C3-9EB60523260D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{69B81B82-6EFE-4941-9E04-C0072F2333C2}"
+	ProjectSection(SolutionItems) = preProject
+		StronglyTypedResourceBuilderCodeDomTest.cs = StronglyTypedResourceBuilderCodeDomTest.cs
+		StronglyTypeResourceBuilderOtherTests.cs = StronglyTypeResourceBuilderOtherTests.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC1620A1-6253-43BA-B3C3-9EB60523260D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC1620A1-6253-43BA-B3C3-9EB60523260D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC1620A1-6253-43BA-B3C3-9EB60523260D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC1620A1-6253-43BA-B3C3-9EB60523260D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = StronglyTypedResourceBuilderTests\StronglyTypedResourceBuilderTests.csproj
+	EndGlobalSection
+EndGlobal
