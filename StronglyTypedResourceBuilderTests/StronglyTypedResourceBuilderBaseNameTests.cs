@@ -59,18 +59,17 @@ namespace StronglyTypedResourceBuilderTests {
 		{
 			// identifier invalid after Going through provider.CreateValidIdentifier throw exception in .NET framework
 			string [] unmatchables;
-			CodeCompileUnit ccu;
 			string input;
 			
 			input = "cla$ss";
 			
-			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            input,
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (testResources,
+	                                            input,
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test]
@@ -101,24 +100,23 @@ namespace StronglyTypedResourceBuilderTests {
 		{
 			// should throw exception
 			string [] unmatchables;
-			CodeCompileUnit ccu;
 			string input;
 			
 			input = null;
 			
-			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            input,
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (testResources,
+	                                            input,
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test]
 		public void BaseNameSpecialChars ()
 		{
-			// provider.CreateValidIdentifier used
+			// StronglyTypedResourceBuilder.VerifyResourceName seems to be used
 			string [] unmatchables;
 			CodeCompileUnit ccu;
 			string input, expected;
@@ -134,7 +132,7 @@ namespace StronglyTypedResourceBuilderTests {
 				                                            true,
 				                                            out unmatchables);
 				
-				expected = StronglyTypedResourceBuilder.VerifyResourceName(input, provider);
+				expected = StronglyTypedResourceBuilder.VerifyResourceName (input, provider);
 				
 				Assert.AreEqual (expected,ccu.Namespaces [0].Types [0].Name); 
 			}

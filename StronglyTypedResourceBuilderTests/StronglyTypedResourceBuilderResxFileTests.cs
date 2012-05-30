@@ -17,17 +17,16 @@ namespace StronglyTypedResourceBuilderTests {
 		{
 			// in .NET framework throws exception
 			string [] unmatchables;
-			CodeCompileUnit ccu;
-			
+
 			string resx = String.Empty;
 			
-			ccu = StronglyTypedResourceBuilder.Create (resx,
-			                                            "TestRes",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (resx,
+	                                            "TestRes",
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test, ExpectedException (typeof (ArgumentException))]
@@ -35,17 +34,16 @@ namespace StronglyTypedResourceBuilderTests {
 		{
 			// in .NET framework throws exception
 			string [] unmatchables;
-			CodeCompileUnit ccu;
-			
+
 			string resx = @"C::::\\\\Hello/World";
 			
-			ccu = StronglyTypedResourceBuilder.Create (resx,
-			                                            "TestRes",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (resx,
+	                                            "TestRes",
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test, ExpectedException (typeof (ArgumentNullException))]
@@ -53,17 +51,16 @@ namespace StronglyTypedResourceBuilderTests {
 		{
 			//should throw exception
 			string [] unmatchables;
-			CodeCompileUnit ccu;
-			
+
 			string resx = null;
 			
-			ccu = StronglyTypedResourceBuilder.Create (resx,
-			                                            "TestRes",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (resx,
+	                                            "TestRes",
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test, ExpectedException (typeof (FileNotFoundException))]
@@ -71,19 +68,18 @@ namespace StronglyTypedResourceBuilderTests {
 		{
 			// not documented on msdn but throws FileNotFoundException
 			string [] unmatchables;
-			CodeCompileUnit ccu;
-			
+
 			//get a valid new filename and then make it not exist
 			string resx = Path.GetTempFileName ();
 			File.Delete (resx);
 			
-			ccu = StronglyTypedResourceBuilder.Create (resx,
-			                                            "TestRes",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (resx,
+	                                            "TestRes",
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test]
@@ -92,18 +88,17 @@ namespace StronglyTypedResourceBuilderTests {
 			//***should throw exception but Not using ExpectedException as i want to delete temp file***
 			string [] unmatchables;
 			bool exceptionRaised = false;
-			CodeCompileUnit ccu;
-			
+
 			string resx = Path.GetTempFileName();
 			
 			try {
-				ccu = StronglyTypedResourceBuilder.Create (resx,
-				                                            "TestRes",
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
+				StronglyTypedResourceBuilder.Create (resx,
+		                                            "TestRes",
+		                                            "TestNamespace",
+		                                            "TestResourcesNameSpace",
+		         									provider,
+		                                            true,
+		                                            out unmatchables);
 			} catch (Exception ex) {
 				exceptionRaised = true;
 				Assert.IsInstanceOf<ArgumentException> (ex);

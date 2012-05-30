@@ -141,15 +141,14 @@ namespace StronglyTypedResourceBuilderTests {
 			// should throw exception
 			Dictionary<string, object> testResources = GetTestResources ();
 			string [] unmatchables;
-			CodeCompileUnit ccu;
-			
-			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									null, //setting provider to null
-			                                            true,
-			                                            out unmatchables);
+
+			StronglyTypedResourceBuilder.Create (testResources,
+	                                            "TestClass",
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									null, //setting provider to null
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test]
@@ -179,18 +178,17 @@ namespace StronglyTypedResourceBuilderTests {
 			// should through exception
 			Dictionary<string, object> testResources;
 			string [] unmatchables; 
-			CodeCompileUnit ccu;
 			CSharpCodeProvider provider = new CSharpCodeProvider ();
 			
 			testResources = null;
 			
-			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestRes",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (testResources,
+	                                            "TestRes",
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 	}

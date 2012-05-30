@@ -25,26 +25,25 @@ namespace StronglyTypedResourceBuilderTests {
 		public void VerifyResourceNameEmpty ()
 		{
 			// should return _
-			
 			string output = StronglyTypedResourceBuilder.VerifyResourceName (string.Empty, provider);
 			
 			Assert.AreEqual ("_", output);
 		}
-		
+
+		[Test, ExpectedException (typeof (ArgumentNullException))]
+		public void VerifyResourceNameNull () {
+			// should throw exception
+			StronglyTypedResourceBuilder.VerifyResourceName (null, provider);
+		}
+
 		[Test]
-		public void VerifyResourceNameSpecialChars ()
-		{
-			// should replace with _
-			string input, expected, output;
+		public void VerifyResourceNameProviderInvalidIdentifiers () {
+			// function tests by means of provider.IsValidIdentifier after other checks
+			string output;
 			
-			foreach (char c in specialChars) {
-				input 	 = string.Format ("{0}a{0}b{0}", c); 
-				expected = string.Format ("{0}a{0}b{0}", '_');
-				
-				output = StronglyTypedResourceBuilder.VerifyResourceName (input, provider);
-				
-				Assert.AreEqual (expected, output);
-			}
+			output = StronglyTypedResourceBuilder.VerifyResourceName ("tes$t", provider);
+			
+			Assert.AreEqual (null, output);
 		}
 		
 		[Test]
@@ -61,16 +60,30 @@ namespace StronglyTypedResourceBuilderTests {
 				Assert.AreEqual (expected, output);
 			}
 		}
-		
-		[Test]
-		public void VerifyResourceNameProviderInvalidIdentifiers () {
-			// function tests by means of provider.IsValidIdentifier after replaces special chars presumably and returns null if true
-			string output;
-			
-			output = StronglyTypedResourceBuilder.VerifyResourceName ("tes$t", provider);
-			
-			Assert.AreEqual (null, output);
+
+		[Test, ExpectedException (typeof (ArgumentNullException))]
+		public void VerifyResourceNameProviderNull () {
+			// should throw exception
+			StronglyTypedResourceBuilder.VerifyResourceName ("tes$t", null);
 		}
+
+		[Test]
+		public void VerifyResourceNameSpecialChars ()
+		{
+			// should replace with _
+			string input, expected, output;
+			
+			foreach (char c in specialChars) {
+				input 	 = string.Format ("{0}a{0}b{0}", c); 
+				expected = string.Format ("{0}a{0}b{0}", '_');
+				
+				output = StronglyTypedResourceBuilder.VerifyResourceName (input, provider);
+				
+				Assert.AreEqual (expected, output);
+			}
+		}
+
+
 	}
 }
 

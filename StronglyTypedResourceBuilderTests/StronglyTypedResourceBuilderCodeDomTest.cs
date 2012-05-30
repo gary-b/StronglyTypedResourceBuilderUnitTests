@@ -170,7 +170,6 @@ namespace StronglyTypedResourceBuilderTests {
 			Assert.AreEqual ("Advanced", cfe1.FieldName);
 			Assert.AreEqual ("System.ComponentModel.EditorBrowsableState", 
 			                 ((CodeTypeReferenceExpression)cfe1.TargetObject).Type.BaseType);
-			
 			//getter
 			Assert.IsInstanceOf<CodeConditionStatement> (resourceManager.GetStatements [0]); 
 			Assert.AreEqual (2, ((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements.Count);

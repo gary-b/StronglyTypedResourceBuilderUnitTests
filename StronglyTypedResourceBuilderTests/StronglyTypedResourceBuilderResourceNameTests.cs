@@ -16,18 +16,17 @@ namespace StronglyTypedResourceBuilderTests {
 			// 2 resources with same names in different cases throws exception in .NET framework
 			Dictionary<string, object> testResources = new Dictionary<string, object> ();
 			string [] unmatchables;
-			CodeCompileUnit ccu;
-			
+
 			testResources.Add ("FortyTwo", String.Empty);
 			testResources.Add ("fortytwo", String.Empty);      		 
 			
-			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+			StronglyTypedResourceBuilder.Create (testResources,
+	                                            "TestClass",
+	                                            "TestNamespace",
+	                                            "TestResourcesNameSpace",
+	         									provider,
+	                                            true,
+	                                            out unmatchables);
 		}
 		
 		[Test]
