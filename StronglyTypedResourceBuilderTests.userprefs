@@ -1,14 +1,19 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="StronglyTypedResourceBuilderTests\StronglyTypedResourceBuilderResourceNameTests.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs">
     <Files>
-      <File FileName="StronglyTypedResourceBuilderTests\StronglyTypedResourceBuilderResourceNameTests.cs" Line="202" Column="4" />
+      <File FileName="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs" Line="38" Column="33" />
+      <File FileName="StronglyTypedResourceBuilderTests/StronglyTypedResourceBuilderCodeDomTest.cs" Line="3" Column="24" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
+          <Node name="StronglyTypedResourceBuilder" expanded="True" selected="True">
+            <Node name="References" expanded="True" />
+            <Node name="System.Resources.Tools" expanded="True" />
+          </Node>
           <Node name="StronglyTypedResourceBuilderTests" expanded="True">
-            <Node name="StronglyTypedResourceBuilderVerifyResourceNameTests.cs" selected="True" />
+            <Node name="References" expanded="True" />
           </Node>
         </State>
       </Pad>
