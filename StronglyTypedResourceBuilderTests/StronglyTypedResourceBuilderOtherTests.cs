@@ -36,6 +36,7 @@ namespace StronglyTypedResourceBuilderTests {
 			tempDict.Add ("bmp", bmp);
 			tempDict.Add ("wav", wav);  
 			
+			wav.Close ();
 			return tempDict;
 		}
 		

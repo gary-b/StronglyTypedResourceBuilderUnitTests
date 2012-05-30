@@ -4,6 +4,8 @@ using System.Resources.Tools;
 using Microsoft.CSharp;
 using System.IO;
 using System.CodeDom;
+using System.Resources;
+using System.Drawing;
 
 namespace StronglyTypedResourceBuilderTests {
 	[TestFixture]
@@ -111,6 +113,49 @@ namespace StronglyTypedResourceBuilderTests {
 			}
 		}
 		
+		[Test]
+		public void ResxFileProcessed ()
+		{
+			// resources in resx should be present in codecompileunit with correct property type
+			string [] unmatchables;
+			CodeCompileUnit ccu;
+			
+			Bitmap bmp = new Bitmap (100, 100);
+			MemoryStream wav = new MemoryStream (1000);
+			
+			string resxFileName = Path.GetTempFileName();
+			
+			using (ResXResourceWriter writer = new ResXResourceWriter(resxFileName)) {
+				writer.AddResource ("astring", "myvalue"); // dont use key of "string" as its a keyword
+				writer.AddResource ("bmp", bmp);
+				writer.AddResource ("wav", wav);
+				writer.Generate ();
+			}
+			
+			ccu = StronglyTypedResourceBuilder.Create (resxFileName,
+			                                            "TestRes",
+			                                            "TestNamespace",
+			                                            "TestResourcesNameSpace",
+			         									provider,
+			                                            true,
+			                                            out unmatchables);
+			
+			CodeMemberProperty cmp;
+			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("astring", ccu);
+			Assert.IsNotNull (cmp);
+			Assert.AreEqual ("System.String", cmp.Type.BaseType);
+			
+			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("wav", ccu);
+			Assert.IsNotNull (cmp);
+			Assert.AreEqual ("System.IO.UnmanagedMemoryStream", cmp.Type.BaseType);
+			
+			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("bmp", ccu);
+			Assert.IsNotNull (cmp);
+			Assert.AreEqual ("System.Drawing.Bitmap", cmp.Type.BaseType);
+			
+			wav.Close ();
+			File.Delete (resxFileName);
+		}
 	}
 }
 
