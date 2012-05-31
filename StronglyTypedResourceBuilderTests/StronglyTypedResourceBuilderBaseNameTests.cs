@@ -9,18 +9,18 @@ namespace StronglyTypedResourceBuilderTests {
 	[TestFixture]
 	public class StronglyTypedResourceBuilderBaseNameTests	{
 		static string [] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
-									"checked", "class", "const", "continue", "decimal", "default", "delegate", 
-									"do", "double", "else", "enum", "event", "explicit", "extern", "FALSE", 
-									"false", "finally", "fixed", "float", "for", "foreach", "goto", "if", 
-									"implicit", "in", "int", "interface", "internal", "is", "lock", "long", 
-									"namespace", "new", "null", "object", "operator", "out", "override", "params", 
-									"private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", 
-									"short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", 
-									"throw", "TRUE", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", 
-									"ushort", "using", "virtual", "volatile", "void", "while" };
+					"checked", "class", "const", "continue", "decimal", "default", "delegate", 
+					"do", "double", "else", "enum", "event", "explicit", "extern", "FALSE", 
+					"false", "finally", "fixed", "float", "for", "foreach", "goto", "if", 
+					"implicit", "in", "int", "interface", "internal", "is", "lock", "long", 
+					"namespace", "new", "null", "object", "operator", "out", "override", "params", 
+					"private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", 
+					"short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", 
+					"throw", "TRUE", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", 
+					"ushort", "using", "virtual", "volatile", "void", "while" };
 		static char [] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
-									'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
-									'}', '\"', '\'', ':', '!'};
+					'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
+					'}', '\"', '\'', ':', '!'};
 		CSharpCodeProvider provider = new CSharpCodeProvider ();
 		Dictionary<string, object> testResources;
 		
@@ -42,12 +42,12 @@ namespace StronglyTypedResourceBuilderTests {
 			input = String.Empty;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            input,
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								input,
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 			
 			expected = "_";
 			
@@ -64,12 +64,12 @@ namespace StronglyTypedResourceBuilderTests {
 			input = "cla$ss";
 			
 			StronglyTypedResourceBuilder.Create (testResources,
-	                                            input,
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								input,
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
 		
 		[Test]
@@ -82,12 +82,12 @@ namespace StronglyTypedResourceBuilderTests {
 			
 			foreach (string input in keywords) {
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            input,
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
+				                                        input,
+				                                        "TestNamespace",
+				                                        "TestResourcesNameSpace",
+				         				provider,
+				                                        true,
+				                                        out unmatchables);
 				
 				expected = provider.CreateValidIdentifier (input);
 				
@@ -105,12 +105,12 @@ namespace StronglyTypedResourceBuilderTests {
 			input = null;
 			
 			StronglyTypedResourceBuilder.Create (testResources,
-	                                            input,
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								input,
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
 		
 		[Test]
@@ -125,12 +125,12 @@ namespace StronglyTypedResourceBuilderTests {
 				input = c.ToString ();
 				
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            input,
-				                                            "TestNamespace",
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
+									input,
+									"TestNamespace",
+									"TestResourcesNameSpace",
+									provider,
+									true,
+									out unmatchables);
 				
 				expected = StronglyTypedResourceBuilder.VerifyResourceName (input, provider);
 				

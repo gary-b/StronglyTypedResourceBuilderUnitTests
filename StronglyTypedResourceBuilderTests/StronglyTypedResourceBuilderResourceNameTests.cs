@@ -13,7 +13,7 @@ namespace StronglyTypedResourceBuilderTests {
 		[Test, ExpectedException (typeof (ArgumentException))]
 		public void ResourceNamesCaseSensitiveDupes ()
 		{
-			// 2 resources with same names in different cases throws exception in .NET framework
+			// passing in case insensitive dupes of resourcenames throws exception in .NET framework
 			Dictionary<string, object> testResources = new Dictionary<string, object> ();
 			string [] unmatchables;
 
@@ -21,14 +21,74 @@ namespace StronglyTypedResourceBuilderTests {
 			testResources.Add ("fortytwo", String.Empty);      		 
 			
 			StronglyTypedResourceBuilder.Create (testResources,
-	                                            "TestClass",
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								"TestClass",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
-		
+
+		[Test, ExpectedException (typeof (ArgumentException))]
+		public void ResourceNamesCaseSensitiveDupesIgnored ()
+		{
+			// passing in case insensitive dupes of resourcenames to be ignored still raises exception
+			Dictionary<string, object> testResources = new Dictionary<string, object> ();
+			string [] unmatchables;
+
+			testResources.Add (">>FortyTwo", String.Empty);
+			testResources.Add (">>fortytwo", String.Empty);      
+
+			StronglyTypedResourceBuilder.Create (testResources,
+								"TestClass",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
+		}
+
+		[Test, ExpectedException (typeof (ArgumentException))]
+		public void ResourceNamesCaseSensitiveDupesInvalid ()
+		{
+			// passing in case insensitive dupes of invalid resourcenames still raises exception
+			Dictionary<string, object> testResources = new Dictionary<string, object> ();
+			string [] unmatchables;
+
+			testResources.Add ("Fo$rtyTwo", String.Empty);
+			testResources.Add ("fo$rtytwo", String.Empty);      		 
+			
+			StronglyTypedResourceBuilder.Create (testResources,
+								"TestClass",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
+		}
+
+		[Test]
+		public void ResourceNamesCaseSensitiveDupesWithSpecialChars ()
+		{
+			// resourcenames with special chars that would result in case insentive dupes go to unmatchables
+
+			Dictionary<string, object> testResources = new Dictionary<string, object> ();
+			string [] unmatchables;
+
+			testResources.Add ("Fo&rtyTwo", String.Empty);
+			testResources.Add ("fo_rtytwo", String.Empty);      		 
+			
+			StronglyTypedResourceBuilder.Create (testResources,
+								"TestClass",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
+			
+			Assert.AreEqual (2,unmatchables.Length);
+		}
+
 		[Test]
 		public void ResourceNamesDuplicate_NETBUG ()
 		{
@@ -57,12 +117,12 @@ namespace StronglyTypedResourceBuilderTests {
 			testResources.Add ("imok", "2");
 			
 			CodeCompileUnit ccu = StronglyTypedResourceBuilder.Create (testResources,
-							                                            "TestRes",
-							                                            "TestNamespace",
-							                                            "TestResourcesNameSpace",
-							         									provider,
-							                                            true,
-							                                            out unmatchables);
+										"TestRes",
+										"TestNamespace",
+										"TestResourcesNameSpace",
+										provider,
+										true,
+										out unmatchables);
 							
 			int matchedResources = testResources.Count - unmatchables.Length;
 			int membersExpected = matchedResources + 5; // 5 standard members
@@ -89,12 +149,12 @@ namespace StronglyTypedResourceBuilderTests {
 			testResources.Add ("imok", "2");
 			
 			CodeCompileUnit ccu = StronglyTypedResourceBuilder.Create (testResources,
-							                                            "TestRes",
-							                                            "TestNamespace",
-							                                            "TestResourcesNameSpace",
-							         									provider,
-							                                            true,
-							                                            out unmatchables);
+										"TestRes",
+										"TestNamespace",
+										"TestResourcesNameSpace",
+										provider,
+										true,
+										out unmatchables);
 			
 			int matchedResources = testResources.Count - unmatchables.Length;
 			int membersExpected = matchedResources + 5; // 5 standard members
@@ -120,19 +180,22 @@ namespace StronglyTypedResourceBuilderTests {
 			// resource name with $ somwhere else goes into unmatchables as invalid with csharpprovider
 			
 			CodeCompileUnit ccu = StronglyTypedResourceBuilder.Create (testResources,
-							                                            "TestRes",
-							                                            "TestNamespace",
-							                                            "TestResourcesNameSpace",
-							         									provider,
-							                                            true,
-							                                            out unmatchables);
-			
+											"TestRes",
+											"TestNamespace",
+											"TestResourcesNameSpace",
+											provider,
+											true,
+											out unmatchables);
+				
 			Assert.AreEqual(0,unmatchables.Length);
 			
 			Assert.AreEqual (8,ccu.Namespaces [0].Types [0].Members.Count);	// 3 valid + 5 standard
-			Assert.IsNotNull (StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("_", ccu));
-			Assert.IsNotNull (StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("_test1", ccu));
-			Assert.IsNotNull (StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("test__", ccu));
+			Assert.IsNotNull (StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+													"_", ccu));
+			Assert.IsNotNull (StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+													"_test1", ccu));
+			Assert.IsNotNull (StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+													"test__", ccu));
 		}
 		
 		[Test]
@@ -146,17 +209,40 @@ namespace StronglyTypedResourceBuilderTests {
 			testResources.Add ("ResourceManager", String.Empty);
 			testResources.Add ("Culture", String.Empty);
 			testResources.Add ("t$est", String.Empty);
-			
+
 			CodeCompileUnit ccu = StronglyTypedResourceBuilder.Create (testResources,
-							                                            "TestRes",
-							                                            "TestNamespace",
-							                                            "TestResourcesNameSpace",
-							         									provider,
-							                                            true,
-							                                            out unmatchables);
+										"TestRes",
+										"TestNamespace",
+										"TestResourcesNameSpace",
+										provider,
+										true,
+										out unmatchables);
 			
 			Assert.AreEqual (3,unmatchables.Length);
 			Assert.AreEqual (5,ccu.Namespaces [0].Types [0].Members.Count);	// 5 standard
+		}
+
+		[Test]
+		public void ResourceNamesInvalidDifferentCase ()
+		{
+			// resources named Culture and ResourceManager go into unmatchables (case sensitive)
+			Dictionary<string, object> testResources = new Dictionary<string, object> ();
+			string [] unmatchables;
+			
+			testResources.Add ("resourceManager", String.Empty);
+			testResources.Add ("culture", String.Empty);
+			testResources.Add ("t$est", String.Empty);
+
+			CodeCompileUnit ccu = StronglyTypedResourceBuilder.Create (testResources,
+										"TestRes",
+										"TestNamespace",
+										"TestResourcesNameSpace",
+										provider,
+										true,
+										out unmatchables);
+			
+			Assert.AreEqual (1,unmatchables.Length);
+			Assert.AreEqual (7,ccu.Namespaces [0].Types [0].Members.Count);	// 5 standard +2
 		}
 		
 	}

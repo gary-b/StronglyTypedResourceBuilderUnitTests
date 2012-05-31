@@ -47,45 +47,46 @@ namespace StronglyTypedResourceBuilderTests {
 			bool isInternal = false;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            isInternal,
-			                                            out unmatchables);
+								"TestClass",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								isInternal,
+								out unmatchables);
 			
 			CodeTypeDeclaration resType = ccu.Namespaces [0].Types [0];
 			Assert.IsTrue (resType.TypeAttributes ==  TypeAttributes.Public);
 			
-			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
+			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+											"ResourceManager", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-               								  | MemberAttributes.Final
-                                              | MemberAttributes.FamilyAndAssembly
-			                                  | MemberAttributes.FamilyOrAssembly));
+							| MemberAttributes.Final
+							| MemberAttributes.FamilyAndAssembly
+							| MemberAttributes.FamilyOrAssembly));
 			
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("Culture", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-               								  | MemberAttributes.Final
-                                              | MemberAttributes.FamilyAndAssembly
-			                                  | MemberAttributes.FamilyOrAssembly));
+							| MemberAttributes.Final
+							| MemberAttributes.FamilyAndAssembly
+							| MemberAttributes.FamilyOrAssembly));
 			
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("astring", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-               								  | MemberAttributes.Final
-                                              | MemberAttributes.FamilyAndAssembly
-			                                  | MemberAttributes.FamilyOrAssembly));
+							| MemberAttributes.Final
+							| MemberAttributes.FamilyAndAssembly
+							| MemberAttributes.FamilyOrAssembly));
 			
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("bmp", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-               								  | MemberAttributes.Final
-                                              | MemberAttributes.FamilyAndAssembly
-			                                  | MemberAttributes.FamilyOrAssembly));
+							| MemberAttributes.Final
+							| MemberAttributes.FamilyAndAssembly
+							| MemberAttributes.FamilyOrAssembly));
 			
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("wav", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-               								  | MemberAttributes.Final
-                                              | MemberAttributes.FamilyAndAssembly
-			                                  | MemberAttributes.FamilyOrAssembly));
+							| MemberAttributes.Final
+							| MemberAttributes.FamilyAndAssembly
+							| MemberAttributes.FamilyOrAssembly));
 		}
 		
 		[Test]
@@ -100,39 +101,40 @@ namespace StronglyTypedResourceBuilderTests {
 			bool isInternal = true;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            isInternal,
-			                                            out unmatchables);
+								"TestClass",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								isInternal,
+								out unmatchables);
 			
 			
 			CodeTypeDeclaration resType = ccu.Namespaces [0].Types [0];
 			Assert.IsTrue (resType.TypeAttributes ==  TypeAttributes.NotPublic);
 			
-			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
+			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+											"ResourceManager", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-               								  | MemberAttributes.Final
-                                              | MemberAttributes.Assembly));
+							| MemberAttributes.Final
+							| MemberAttributes.Assembly));
 			
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("Culture", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-			               						| MemberAttributes.Final
-			                                  	| MemberAttributes.Assembly));
+							| MemberAttributes.Final
+							| MemberAttributes.Assembly));
 			
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("astring", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-			               						 | MemberAttributes.Final
-			                                 	| MemberAttributes.Assembly));
+							| MemberAttributes.Final
+							| MemberAttributes.Assembly));
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("bmp", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-			               						| MemberAttributes.Final
-			                                    | MemberAttributes.Assembly));
+							| MemberAttributes.Final
+							| MemberAttributes.Assembly));
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("wav", ccu);
 			Assert.IsTrue (cmp.Attributes == (MemberAttributes.Abstract
-			               						| MemberAttributes.Final
-			                                  	| MemberAttributes.Assembly));
+							| MemberAttributes.Final
+							| MemberAttributes.Assembly));
 		}
 		
 		[Test, ExpectedException (typeof (ArgumentNullException))]
@@ -143,12 +145,12 @@ namespace StronglyTypedResourceBuilderTests {
 			string [] unmatchables;
 
 			StronglyTypedResourceBuilder.Create (testResources,
-	                                            "TestClass",
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									null, //setting provider to null
-	                                            true,
-	                                            out unmatchables);
+							"TestClass",
+							"TestNamespace",
+							"TestResourcesNameSpace",
+							null, //setting provider to null
+							true,
+							out unmatchables);
 		}
 		
 		[Test]
@@ -162,12 +164,12 @@ namespace StronglyTypedResourceBuilderTests {
 			testResources = new Dictionary<string, object> ();
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestRes",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 			
 			Assert.AreEqual(5,ccu.Namespaces [0].Types [0].Members.Count);
 		}
@@ -183,12 +185,12 @@ namespace StronglyTypedResourceBuilderTests {
 			testResources = null;
 			
 			StronglyTypedResourceBuilder.Create (testResources,
-	                                            "TestRes",
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
 		
 	}

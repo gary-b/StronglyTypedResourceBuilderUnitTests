@@ -21,12 +21,12 @@ namespace StronglyTypedResourceBuilderTests {
 			string resx = String.Empty;
 			
 			StronglyTypedResourceBuilder.Create (resx,
-	                                            "TestRes",
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
 		
 		[Test, ExpectedException (typeof (ArgumentException))]
@@ -38,12 +38,12 @@ namespace StronglyTypedResourceBuilderTests {
 			string resx = @"C::::\\\\Hello/World";
 			
 			StronglyTypedResourceBuilder.Create (resx,
-	                                            "TestRes",
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
 		
 		[Test, ExpectedException (typeof (ArgumentNullException))]
@@ -55,12 +55,12 @@ namespace StronglyTypedResourceBuilderTests {
 			string resx = null;
 			
 			StronglyTypedResourceBuilder.Create (resx,
-	                                            "TestRes",
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
 		
 		[Test, ExpectedException (typeof (FileNotFoundException))]
@@ -74,12 +74,12 @@ namespace StronglyTypedResourceBuilderTests {
 			File.Delete (resx);
 			
 			StronglyTypedResourceBuilder.Create (resx,
-	                                            "TestRes",
-	                                            "TestNamespace",
-	                                            "TestResourcesNameSpace",
-	         									provider,
-	                                            true,
-	                                            out unmatchables);
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 		}
 		
 		[Test]
@@ -93,12 +93,12 @@ namespace StronglyTypedResourceBuilderTests {
 			
 			try {
 				StronglyTypedResourceBuilder.Create (resx,
-		                                            "TestRes",
-		                                            "TestNamespace",
-		                                            "TestResourcesNameSpace",
-		         									provider,
-		                                            true,
-		                                            out unmatchables);
+									"TestRes",
+									"TestNamespace",
+									"TestResourcesNameSpace",
+									provider,
+									true,
+									out unmatchables);
 			} catch (Exception ex) {
 				exceptionRaised = true;
 				Assert.IsInstanceOf<ArgumentException> (ex);
@@ -128,12 +128,12 @@ namespace StronglyTypedResourceBuilderTests {
 			}
 			
 			ccu = StronglyTypedResourceBuilder.Create (resxFileName,
-			                                            "TestRes",
-			                                            "TestNamespace",
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 			
 			CodeMemberProperty cmp;
 			cmp = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("astring", ccu);

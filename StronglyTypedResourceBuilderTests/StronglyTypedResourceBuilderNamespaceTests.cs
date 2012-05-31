@@ -9,18 +9,18 @@ namespace StronglyTypedResourceBuilderTests {
 	[TestFixture]
 	public class StronglyTypedResourceBuilderNamespaceTests	{
 		static string [] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 
-									"checked", "class", "const", "continue", "decimal", "default", "delegate", 
-									"do", "double", "else", "enum", "event", "explicit", "extern", "FALSE", 
-									"false", "finally", "fixed", "float", "for", "foreach", "goto", "if", 
-									"implicit", "in", "int", "interface", "internal", "is", "lock", "long", 
-									"namespace", "new", "null", "object", "operator", "out", "override", "params", 
-									"private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", 
-									"short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", 
-									"throw", "TRUE", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", 
-									"ushort", "using", "virtual", "volatile", "void", "while" };
+					"checked", "class", "const", "continue", "decimal", "default", "delegate", 
+					"do", "double", "else", "enum", "event", "explicit", "extern", "FALSE", 
+					"false", "finally", "fixed", "float", "for", "foreach", "goto", "if", 
+					"implicit", "in", "int", "interface", "internal", "is", "lock", "long", 
+					"namespace", "new", "null", "object", "operator", "out", "override", "params", 
+					"private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", 
+					"short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", 
+					"throw", "TRUE", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", 
+					"ushort", "using", "virtual", "volatile", "void", "while" };
 		static char [] specialChars = { ' ', '\u00A0', '.', ',', ';', '|', '~', '@', '#', '%', '^', '&', 
-									'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
-									'}', '\"', '\'', ':', '!'};
+					'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
+					'}', '\"', '\'', ':', '!'};
 		CSharpCodeProvider provider = new CSharpCodeProvider ();
 		Dictionary<string, object> testResources;
 		
@@ -44,12 +44,12 @@ namespace StronglyTypedResourceBuilderTests {
 			expected = String.Empty;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            input,
-			                                            "TestResourceNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								"TestClass",
+								input,
+								"TestResourceNameSpace",
+								provider,
+								true,
+								out unmatchables);
 			
 			Assert.AreEqual (expected,ccu.Namespaces [0].Name);
 		}
@@ -67,12 +67,12 @@ namespace StronglyTypedResourceBuilderTests {
 			expected = String.Empty;
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            input,
-			                                            "TestResourceNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								"TestClass",
+								input,
+								"TestResourceNameSpace",
+								provider,
+								true,
+								out unmatchables);
 			
 			Assert.AreEqual (expected,ccu.Namespaces [0].Name);
 		}
@@ -89,12 +89,12 @@ namespace StronglyTypedResourceBuilderTests {
 			expected = "te$st";
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            input,
-			                                            "TestResourcesNameSpace",
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								"TestClass",
+								input,
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
 			
 			output = ccu.Namespaces [0].Name;
 			
@@ -110,12 +110,12 @@ namespace StronglyTypedResourceBuilderTests {
 
 			foreach (string input in keywords) {
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            "TestClass",
-				                                            input,
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
+									"TestClass",
+									input,
+									"TestResourcesNameSpace",
+									provider,
+									true,
+									out unmatchables);
 				
 				expected = provider.CreateValidIdentifier (input);
 				
@@ -136,12 +136,12 @@ namespace StronglyTypedResourceBuilderTests {
 				input = "Primary." + word;
 				
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            "TestClass",
-				                                            input,
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
+									"TestClass",
+									input,
+									"TestResourcesNameSpace",
+									provider,
+									true,
+									out unmatchables);
 				
 				expected = provider.CreateValidIdentifier (input);
 				
@@ -167,12 +167,12 @@ namespace StronglyTypedResourceBuilderTests {
 					expected = StronglyTypedResourceBuilder.VerifyResourceName(input, provider);
 			
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            "TestClass",
-				                                            input,
-				                                            "TestResourcesNameSpace",
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
+									"TestClass",
+									input,
+									"TestResourcesNameSpace",
+									provider,
+									true,
+									out unmatchables);
 				
 				output = ccu.Namespaces [0].Name;
 				
@@ -195,14 +195,15 @@ namespace StronglyTypedResourceBuilderTests {
 			expected = "TestClass";
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            "TestNameSpace",
-			                                            input,
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								"TestClass",
+								"TestNameSpace",
+								input,
+								provider,
+								true,
+								out unmatchables);
 			
-			resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
+			resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+													"ResourceManager", ccu);
 			cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
 			output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 			
@@ -224,20 +225,21 @@ namespace StronglyTypedResourceBuilderTests {
 			expected = "TestNameSpace.TestClass";
 			
 			ccu = StronglyTypedResourceBuilder.Create (testResources,
-			                                            "TestClass",
-			                                            "TestNameSpace",
-			                                            input,
-			         									provider,
-			                                            true,
-			                                            out unmatchables);
+								"TestClass",
+								"TestNameSpace",
+								input,
+								provider,
+								true,
+								out unmatchables);
 			
-			resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
+			resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+													"ResourceManager", ccu);
 			cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
 			output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 			
 			Assert.AreEqual (expected,output);
 		}
-				
+
 		[Test]
 		public void ResourcesNamespaceProviderKeywords ()
 		{
@@ -250,16 +252,16 @@ namespace StronglyTypedResourceBuilderTests {
 			
 			foreach (string input in keywords) {
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            "TestClass",
-				                                            "TestNamespace",
-				                                            input,
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
-				
-				
+									"TestClass",
+									"TestNamespace",
+									input,
+									provider,
+									true,
+									out unmatchables);
+
 				expected = input + ".TestClass";
-				resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
+				resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+													"ResourceManager", ccu);
 				cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
 				output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 				
@@ -283,14 +285,15 @@ namespace StronglyTypedResourceBuilderTests {
 				expected = input + ".TestClass";
 				
 				ccu = StronglyTypedResourceBuilder.Create (testResources,
-				                                            "TestClass",
-				                                            "TestNameSpace",
-				                                            input,
-				         									provider,
-				                                            true,
-				                                            out unmatchables);
+									"TestClass",
+									"TestNameSpace",
+									input,
+									provider,
+									true,
+									out unmatchables);
 				
-				resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> ("ResourceManager", ccu);
+				resourceManager = StronglyTypedResourceBuilderCodeDomTest.Get<CodeMemberProperty> (
+													"ResourceManager", ccu);
 				cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
 				output  = ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value.ToString ();
 				

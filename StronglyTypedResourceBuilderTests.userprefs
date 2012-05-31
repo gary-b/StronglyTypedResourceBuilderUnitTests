@@ -2,19 +2,18 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs">
     <Files>
-      <File FileName="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs" Line="38" Column="33" />
-      <File FileName="StronglyTypedResourceBuilderTests/StronglyTypedResourceBuilderCodeDomTest.cs" Line="3" Column="24" />
+      <File FileName="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs" Line="31" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="StronglyTypedResourceBuilder" expanded="True" selected="True">
+          <Node name="StronglyTypedResourceBuilder" expanded="True">
             <Node name="References" expanded="True" />
-            <Node name="System.Resources.Tools" expanded="True" />
+            <Node name="System.Resources.Tools" expanded="True">
+              <Node name="StronglyTypedResourceBuilder.cs" selected="True" />
+            </Node>
           </Node>
-          <Node name="StronglyTypedResourceBuilderTests" expanded="True">
-            <Node name="References" expanded="True" />
-          </Node>
+          <Node name="StronglyTypedResourceBuilderTests" expanded="True" />
         </State>
       </Pad>
       <Pad Id="ClassPad">

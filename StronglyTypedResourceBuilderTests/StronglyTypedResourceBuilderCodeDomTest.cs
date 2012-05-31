@@ -14,7 +14,7 @@ namespace StronglyTypedResourceBuilderTests {
 	public class StronglyTypedResourceBuilderCodeDomTest {
 		CodeCompileUnit sampleCcu;
 		string [] unmatchables;
-		Dictionary<string,object> testResources;
+		Dictionary<string, object> testResources;
 		
 		public static T Get<T> (string propertyName, CodeCompileUnit ccu) where T:CodeTypeMember
 		{
@@ -45,12 +45,12 @@ namespace StronglyTypedResourceBuilderTests {
 			testResources.Add ("datetime", dt);
 			
 			sampleCcu = StronglyTypedResourceBuilder.Create (testResources,
-			                                           "TestRes",
-			                                           "TestNamespace",
-			                                           "TestResourcesNamespace",
-			         									new CSharpCodeProvider (),
-			                                            true,
-			                                            out unmatchables);
+									"TestRes",
+									"TestNamespace",
+									"TestResourcesNamespace",
+									new CSharpCodeProvider (),
+									true,
+									out unmatchables);
 			
 			wav.Close();
 		}
@@ -82,7 +82,8 @@ namespace StronglyTypedResourceBuilderTests {
 			
 			//attributes
 			Assert.AreEqual (3,resType.CustomAttributes.Count);
-			Assert.AreEqual ("System.CodeDom.Compiler.GeneratedCodeAttribute", resType.CustomAttributes [0].Name);
+			Assert.AreEqual ("System.CodeDom.Compiler.GeneratedCodeAttribute", 
+			                 resType.CustomAttributes [0].Name);
 			Assert.AreEqual (2, resType.CustomAttributes [0].Arguments.Count);
 			
 			CodePrimitiveExpression cpe1 = (CodePrimitiveExpression) resType.CustomAttributes [0].Arguments [0].Value;
@@ -91,10 +92,12 @@ namespace StronglyTypedResourceBuilderTests {
 			Assert.AreEqual ("System.Resources.Tools.StronglyTypedResourceBuilder", (string)cpe1.Value);
 			Assert.IsTrue (Regex.IsMatch((string)cpe2.Value,@"^\d\.\d\.\d\.\d$")); // coming back as 4.0.0.0 even with project set to .net 2.0 running on MD under .NET?
 			
-			Assert.AreEqual ("System.Diagnostics.DebuggerNonUserCodeAttribute", resType.CustomAttributes [1].Name);
+			Assert.AreEqual ("System.Diagnostics.DebuggerNonUserCodeAttribute", 
+			                 resType.CustomAttributes [1].Name);
 			Assert.AreEqual (0, resType.CustomAttributes [1].Arguments.Count);
 			
-			Assert.AreEqual ("System.Runtime.CompilerServices.CompilerGeneratedAttribute", resType.CustomAttributes [2].Name);
+			Assert.AreEqual ("System.Runtime.CompilerServices.CompilerGeneratedAttribute", 
+			                 resType.CustomAttributes [2].Name);
 			Assert.AreEqual (0, resType.CustomAttributes [2].Arguments.Count);
 		}
 		
@@ -109,7 +112,8 @@ namespace StronglyTypedResourceBuilderTests {
 			
 			//attributes
 			Assert.AreEqual (1,ctor.CustomAttributes.Count);
-			Assert.AreEqual ("System.Diagnostics.CodeAnalysis.SuppressMessageAttribute", ctor.CustomAttributes [0].Name);
+			Assert.AreEqual ("System.Diagnostics.CodeAnalysis.SuppressMessageAttribute", 
+			                 ctor.CustomAttributes [0].Name);
 			Assert.AreEqual (2, ctor.CustomAttributes [0].Arguments.Count);
 			
 			CodePrimitiveExpression cpe1 = (CodePrimitiveExpression) ctor.CustomAttributes [0].Arguments[0].Value;
@@ -144,9 +148,9 @@ namespace StronglyTypedResourceBuilderTests {
 			Assert.AreEqual ("System.Globalization.CultureInfo", resourceCulture.Type.BaseType);
 			//access modifier
 			Assert.IsTrue (resourceCulture.Attributes == (MemberAttributes.Abstract
-			                                          		| MemberAttributes.Final
-			                                          		| MemberAttributes.Assembly
-			                                          		| MemberAttributes.FamilyOrAssembly));
+									| MemberAttributes.Final
+									| MemberAttributes.Assembly
+									| MemberAttributes.FamilyOrAssembly));
 		}
 		
 		[Test]
@@ -158,26 +162,30 @@ namespace StronglyTypedResourceBuilderTests {
 			Assert.AreEqual ("System.Resources.ResourceManager", resourceManager.Type.BaseType);
 			//access modifer
 			Assert.IsTrue (resourceManager.Attributes == (MemberAttributes.Abstract
-			               								  | MemberAttributes.Final
-			                                              | MemberAttributes.Assembly));
+				               				| MemberAttributes.Final
+				                                        | MemberAttributes.Assembly));
 			// attributes
 			Assert.AreEqual (1, resourceManager.CustomAttributes.Count);
-			Assert.AreEqual ("System.ComponentModel.EditorBrowsableAttribute", resourceManager.CustomAttributes [0].Name);
+			Assert.AreEqual ("System.ComponentModel.EditorBrowsableAttribute", 
+			                 resourceManager.CustomAttributes [0].Name);
 			Assert.AreEqual (1, resourceManager.CustomAttributes [0].Arguments.Count);
 			
-			CodeFieldReferenceExpression cfe1 = (CodeFieldReferenceExpression) resourceManager.CustomAttributes [0].Arguments [0].Value;
+			CodeFieldReferenceExpression cfe1 = (CodeFieldReferenceExpression)resourceManager.CustomAttributes [0].Arguments [0].Value;
 			
 			Assert.AreEqual ("Advanced", cfe1.FieldName);
 			Assert.AreEqual ("System.ComponentModel.EditorBrowsableState", 
 			                 ((CodeTypeReferenceExpression)cfe1.TargetObject).Type.BaseType);
 			//getter
 			Assert.IsInstanceOf<CodeConditionStatement> (resourceManager.GetStatements [0]); 
-			Assert.AreEqual (2, ((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements.Count);
+			Assert.AreEqual (2, 
+			                 ((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements.Count);
 			
 			CodeVariableDeclarationStatement cvds = ((CodeVariableDeclarationStatement)((CodeConditionStatement)resourceManager.GetStatements [0]).TrueStatements [0]);
 			
-			Assert.AreEqual ("System.Resources.ResourceManager",((CodeObjectCreateExpression)cvds.InitExpression).CreateType.BaseType);
-			Assert.AreEqual ("TestResourcesNamespace.TestRes",((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value);
+			Assert.AreEqual ("System.Resources.ResourceManager",
+			                 ((CodeObjectCreateExpression)cvds.InitExpression).CreateType.BaseType);
+			Assert.AreEqual ("TestResourcesNamespace.TestRes",
+			                 ((CodePrimitiveExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [0]).Value);
 			
 			CodePropertyReferenceExpression cpre = (CodePropertyReferenceExpression)((CodeObjectCreateExpression)cvds.InitExpression).Parameters [1];
 			
@@ -199,11 +207,12 @@ namespace StronglyTypedResourceBuilderTests {
 			Assert.AreEqual ("System.Globalization.CultureInfo", culture.Type.BaseType);
 			
 			Assert.IsTrue (culture.Attributes == (MemberAttributes.Abstract
-			               						  | MemberAttributes.Final
-			                                      | MemberAttributes.Assembly));
+								| MemberAttributes.Final
+								| MemberAttributes.Assembly));
 			
 			Assert.AreEqual (1,culture.CustomAttributes.Count);
-			Assert.AreEqual ("System.ComponentModel.EditorBrowsableAttribute", culture.CustomAttributes [0].Name);
+			Assert.AreEqual ("System.ComponentModel.EditorBrowsableAttribute", 
+			                 culture.CustomAttributes [0].Name);
 			CodeFieldReferenceExpression cfe1 = (CodeFieldReferenceExpression) culture.CustomAttributes [0].Arguments [0].Value;
 			
 			Assert.AreEqual ("Advanced", cfe1.FieldName);
@@ -217,8 +226,10 @@ namespace StronglyTypedResourceBuilderTests {
 			
 			// setter
 			Assert.AreEqual (1, culture.SetStatements.Count);
-			Assert.AreEqual("resourceCulture", ((CodeFieldReferenceExpression)((CodeAssignStatement)culture.SetStatements [0]).Left).FieldName);
-			Assert.IsInstanceOf<CodePropertySetValueReferenceExpression> (((CodeAssignStatement)culture.SetStatements [0]).Right);
+			Assert.AreEqual("resourceCulture", 
+			                ((CodeFieldReferenceExpression)((CodeAssignStatement)culture.SetStatements [0]).Left).FieldName);
+			Assert.IsInstanceOf<CodePropertySetValueReferenceExpression> (
+										((CodeAssignStatement)culture.SetStatements [0]).Right);
 		}
 		
 		[Test]
@@ -242,18 +253,22 @@ namespace StronglyTypedResourceBuilderTests {
 				CodeVariableDeclarationStatement cvds = (CodeVariableDeclarationStatement)cmp.GetStatements [0];
 				
 				Assert.AreEqual ("obj", cvds.Name);
-				Assert.AreEqual ("GetObject", ((CodeMethodInvokeExpression)cvds.InitExpression).Method.MethodName);
+				Assert.AreEqual ("GetObject", 
+				                 ((CodeMethodInvokeExpression)cvds.InitExpression).Method.MethodName);
 				
 				CodeMethodInvokeExpression cmie = ((CodeMethodInvokeExpression)cvds.InitExpression);
 				
-				Assert.AreEqual ("ResourceManager", ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
+				Assert.AreEqual ("ResourceManager", 
+				                 ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
 				Assert.AreEqual (kvp.Key, ((CodePrimitiveExpression)cmie.Parameters [0]).Value);
-				Assert.AreEqual ("resourceCulture", ((CodeFieldReferenceExpression)cmie.Parameters [1]).FieldName);
+				Assert.AreEqual ("resourceCulture", 
+				                 ((CodeFieldReferenceExpression)cmie.Parameters [1]).FieldName);
 				
 				CodeCastExpression cce = ((CodeCastExpression)((CodeMethodReturnStatement)cmp.GetStatements [1]).Expression);
 				
 				Assert.AreEqual (thisType.FullName, ((CodeTypeReference)cce.TargetType).BaseType);
-				Assert.AreEqual ("obj", ((CodeVariableReferenceExpression)cce.Expression).VariableName);
+				Assert.AreEqual ("obj", 
+				                 ((CodeVariableReferenceExpression)cce.Expression).VariableName);
 			}
 		}
 		
@@ -276,7 +291,10 @@ namespace StronglyTypedResourceBuilderTests {
 				
 				Assert.AreEqual ("GetString",cmie.Method.MethodName);
 				Assert.AreEqual (kvp.Key,((CodePrimitiveExpression)cmie.Parameters[0]).Value);
-				Assert.AreEqual ("ResourceManager", ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
+				Assert.AreEqual ("ResourceManager", 
+				                 ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
+				Assert.AreEqual ("resourceCulture", 
+				                 ((CodeFieldReferenceExpression)cmie.Parameters [1]).FieldName);
 			}
 		}
 		
@@ -297,7 +315,10 @@ namespace StronglyTypedResourceBuilderTests {
 				
 				Assert.AreEqual ("GetStream", cmie.Method.MethodName);
 				Assert.AreEqual (kvp.Key, ((CodePrimitiveExpression)cmie.Parameters[0]).Value);
-				Assert.AreEqual ("ResourceManager", ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
+				Assert.AreEqual ("ResourceManager", 
+				                 ((CodePropertyReferenceExpression)cmie.Method.TargetObject).PropertyName);
+				Assert.AreEqual ("resourceCulture", 
+				                 ((CodeFieldReferenceExpression)cmie.Parameters [1]).FieldName);
 			}
 		}
 	}
