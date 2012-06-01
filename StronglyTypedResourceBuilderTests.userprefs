@@ -1,19 +1,21 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs" Line="31" Column="1" />
+      <File FileName="StronglyTypedResourceBuilder/System.Resources.Tools/StronglyTypedResourceBuilder.cs" Line="427" Column="3" />
+      <File FileName="StronglyTypedResourceBuilderTests/StronglyTypedResourceBuilderCodeDomTest.cs" Line="301" Column="9" />
+      <File FileName="StronglyTypedResourceBuilderTests/StronglyTypedResourceBuilderResourceNameTests.cs" Line="200" Column="3" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="StronglyTypedResourceBuilder" expanded="True">
             <Node name="References" expanded="True" />
-            <Node name="System.Resources.Tools" expanded="True">
-              <Node name="StronglyTypedResourceBuilder.cs" selected="True" />
-            </Node>
+            <Node name="System.Resources.Tools" expanded="True" />
           </Node>
-          <Node name="StronglyTypedResourceBuilderTests" expanded="True" />
+          <Node name="StronglyTypedResourceBuilderTests" expanded="True">
+            <Node name="StronglyTypedResourceBuilderResourceNameTests.cs" selected="True" />
+          </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
@@ -23,12 +25,20 @@
         <State />
       </Pad>
       <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State expanded="True" selected="True" />
+        <State expanded="True">
+          <Node name="StronglyTypedResourceBuilderTests" expanded="True">
+            <Node name="StronglyTypedResourceBuilderTests" expanded="True">
+              <Node name="StronglyTypedResourceBuilderResxFileTests" expanded="True" />
+            </Node>
+          </Node>
+        </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/garyb/StronglyTypedResourceBuilderTests/StronglyTypedResourceBuilderTests/StronglyTypedResourceBuilderResourceNameTests.cs" line="81" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

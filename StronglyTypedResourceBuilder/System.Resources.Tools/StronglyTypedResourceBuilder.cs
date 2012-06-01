@@ -95,15 +95,13 @@ namespace System.Resources.Tools
 			string baseNameToUse, generatedCodeNamespaceToUse;
 			string resourcesToUse;
 			
-			// validate ResourcesList
+			// validate parameters, convert into useable form where necessary / possible
 			if (resourceList == null)
 				throw new ArgumentNullException ("Parameter resourceList must not be null");
 			
-			// validate provider
 			if (codeProvider == null)
 				throw new ArgumentNullException ("Parameter: codeProvider must not be null");
 			
-			// validate baseName, get baseNameToUse
 			if (baseName == null)
 				throw new ArgumentNullException ("Parameter: baseName must not be null");
 
@@ -112,7 +110,6 @@ namespace System.Resources.Tools
 			if (baseNameToUse == null)
 				throw new ArgumentException ("Parameter: baseName is invalid");
 			
-			// validate generatedCodeNamespace
 			if (generatedCodeNamespace == null) {
 				generatedCodeNamespaceToUse = "";
 			} else {
@@ -120,29 +117,125 @@ namespace System.Resources.Tools
 				generatedCodeNamespaceToUse = codeProvider.CreateValidIdentifier (
 											generatedCodeNamespaceToUse);
 			}
-			
-			// validate resourcesNamespace
+
 			if (resourcesNamespace == null)
 				resourcesToUse = generatedCodeNamespaceToUse + "." + baseNameToUse;
 			else if (resourcesNamespace == String.Empty)
 				resourcesToUse = baseNameToUse;
 			else
 				resourcesToUse = resourcesNamespace + "." + baseNameToUse;
-			
-			
-			// CodeDOM
-			
+
+			// validate ResourceList IDictionary
+
+			//FIXME: is it correct to use OrdinalIgnoreCase here?
+			Dictionary<string,ResourceItem> resourceItemDict;
+			resourceItemDict = new Dictionary<string,ResourceItem> (StringComparer.OrdinalIgnoreCase);
+
+			//allow ArgumentException to be raised if case insensitive dupes present
+			foreach (DictionaryEntry de in resourceList)
+				resourceItemDict.Add (de.Key.ToString (), new ResourceItem (de.Value));
+
+			ProcessResourceList (resourceItemDict, codeProvider);
+
+			// Generate CodeDOM
+			CodeCompileUnit ccu = GenerateCodeDOMBase (baseNameToUse, generatedCodeNamespaceToUse, resourcesToUse, internalClass);
+
+			// add properties for resources
+			unmatchable = ResourcePropertyGeneration (ccu.Namespaces [0].Types [0], resourceItemDict, internalClass);
+
+			return ccu;
+		}
+
+		static string[] ResourcePropertyGeneration (CodeTypeDeclaration resType, Dictionary<string, ResourceItem> resourceItemDict, bool internalClass)
+		{
+			// either create properties for resources, ignore or add to unmatchableList
+			List<string> unmatchableList = new List<string> ();
+
+			foreach (KeyValuePair<string, ResourceItem> kvp in resourceItemDict) {
+				if (kvp.Value.isUnmatchable)
+					unmatchableList.Add (kvp.Key); // orig key
+				else if (!kvp.Value.toIgnore) {
+						if (kvp.Value.Resource is Stream)
+							resType.Members.Add (GenerateStreamResourceProp (kvp.Value.VerifiedKey,
+												kvp.Key,
+												internalClass));
+						else if (kvp.Value.Resource is String)
+							resType.Members.Add (GenerateStringResourceProp (kvp.Value.VerifiedKey,
+												kvp.Key,
+						                                     		internalClass));
+						else
+							resType.Members.Add (GenerateStandardResourceProp (kvp.Value.VerifiedKey,
+												kvp.Key,
+												kvp.Value.Resource.GetType (),
+												internalClass));
+				}
+			}
+
+			return unmatchableList.ToArray ();
+		}
+
+		static CodeCompileUnit GenerateCodeDOMBase (string baseNameToUse, string generatedCodeNamespaceToUse, 
+		                                    	    string resourcesToUse, bool internalClass)
+		{
 			CodeCompileUnit ccu = new CodeCompileUnit ();
 			ccu.ReferencedAssemblies.Add (@"System.dll");
-
-			//namespace
 			CodeNamespace nsMain = new CodeNamespace (generatedCodeNamespaceToUse);
 			ccu.Namespaces.Add (nsMain);
 			nsMain.Imports.Add (new CodeNamespaceImport ("System"));
 			
 			//class
-			CodeTypeDeclaration resType = new CodeTypeDeclaration (baseNameToUse);
+			CodeTypeDeclaration resType = GenerateBaseType (baseNameToUse, internalClass);
 			nsMain.Types.Add (resType);
+
+			GenerateFields (resType);
+
+			resType.Members.Add (GenerateConstructor ());
+
+			// Default Properties
+			resType.Members.Add (GenerateResourceManagerProp (baseNameToUse, resourcesToUse, internalClass));
+			resType.Members.Add (GenerateCultureProp (internalClass));
+
+			return ccu;
+		}
+
+		static void ProcessResourceList (Dictionary<string, ResourceItem> resourceItemDict, CodeDomProvider codeProvider)
+		{
+			foreach (KeyValuePair<string, ResourceItem> kvp in resourceItemDict) {
+				//deal with ignored keys
+				if (kvp.Key.StartsWith(">>") || kvp.Key.StartsWith ("$")) {
+					kvp.Value.toIgnore = true;
+					continue;
+				}
+				//deal with specified invalid names (case sensitive)
+				if (kvp.Key == "ResourceManager" || kvp.Key == "Culture") {
+					kvp.Value.isUnmatchable = true;
+					continue;
+				}
+
+				kvp.Value.VerifiedKey = VerifyResourceName (kvp.Key, codeProvider);
+				// will be null if codeProvider deems invalid
+				if (kvp.Value.VerifiedKey == null) {
+					kvp.Value.isUnmatchable = true;
+					continue;
+				}
+				//dupe check
+				foreach (KeyValuePair<string, ResourceItem> item in resourceItemDict) {
+					// skip on encountering kvp or if VerifiedKey on object null (ie hasnt been processed yet)
+					if (Object.ReferenceEquals (item.Value, kvp.Value)
+					    || item.Value.VerifiedKey == null)
+					    continue;
+					// if case insensitive dupe found mark both
+					if (item.Value.VerifiedKey.ToLower () == kvp.Value.VerifiedKey.ToLower ()) {
+						item.Value.isUnmatchable = true;
+						kvp.Value.isUnmatchable = true;
+					}
+				}
+			}
+		}
+
+		static CodeTypeDeclaration GenerateBaseType (string baseNameToUse, bool internalClass)
+		{
+			CodeTypeDeclaration resType = new CodeTypeDeclaration (baseNameToUse);
 			resType.IsClass = true;
 			// set access modifier for class
 			if (internalClass)
@@ -151,28 +244,27 @@ namespace System.Resources.Tools
 				resType.TypeAttributes =  TypeAttributes.Public;
 			
 			//class CustomAttributes
-			
-			CodeAttributeDeclaration genCodeAt = new CodeAttributeDeclaration (
-											"System.CodeDom.Compiler.GeneratedCodeAttribute");
-			CodeAttributeArgument genCodeAtTool = new CodeAttributeArgument (
-											new CodePrimitiveExpression (
-											"System.Resources.Tools.StronglyTypedResourceBuilder"));
-			genCodeAt.Arguments.Add (genCodeAtTool);
-			//FIXME: .net always returns 4.0.0.0?
-			CodeAttributeArgument genCodeAtVer = new CodeAttributeArgument (
-											new CodePrimitiveExpression ("4.0.0.0")); 
-			genCodeAt.Arguments.Add (genCodeAtVer);
-			resType.CustomAttributes.Add (genCodeAt);
-			
-			// System.Diagnostics.DebuggerNonUserCodeAttribute
-			CodeAttributeDeclaration dbNonUserAt = new CodeAttributeDeclaration (
-											"System.Diagnostics.DebuggerNonUserCodeAttribute");
-			resType.CustomAttributes.Add (dbNonUserAt);
-			// System.Runtime.CompilerServices.CompilerGeneratedAttribute
-			CodeAttributeDeclaration compGenAt = new CodeAttributeDeclaration (
-											"System.Runtime.CompilerServices.CompilerGeneratedAttribute");
-			resType.CustomAttributes.Add (compGenAt);
-			
+
+			//FIXME: .net always returns 4.0.0.0? should i identifify tool as mono?
+			resType.CustomAttributes.Add (new CodeAttributeDeclaration (
+							"System.CodeDom.Compiler.GeneratedCodeAttribute",
+							new CodeAttributeArgument (
+							new CodePrimitiveExpression (
+							"System.Resources.Tools.StronglyTypedResourceBuilder")),
+							new CodeAttributeArgument (
+							new CodePrimitiveExpression ("4.0.0.0"))));
+
+
+			resType.CustomAttributes.Add (new CodeAttributeDeclaration (
+							"System.Diagnostics.DebuggerNonUserCodeAttribute"));
+
+			resType.CustomAttributes.Add (new CodeAttributeDeclaration (
+							"System.Runtime.CompilerServices.CompilerGeneratedAttribute"));
+
+			return resType;
+		}
+		static void GenerateFields (CodeTypeDeclaration resType)
+		{
 			//resourceMan field
 			CodeMemberField resourceManField = new CodeMemberField();
 			resourceManField.Attributes = (MemberAttributes.Abstract
@@ -192,39 +284,71 @@ namespace System.Resources.Tools
 			resourceCultureField.Name = "resourceCulture";
 			resourceCultureField.Type = new CodeTypeReference (typeof (System.Globalization.CultureInfo));
 			resType.Members.Add (resourceCultureField);
-			
-			//constructor
+		}
+
+		static CodeConstructor GenerateConstructor ()
+		{
 			CodeConstructor ctor = new CodeConstructor ();
 			ctor.Attributes = MemberAttributes.FamilyAndAssembly; // always internal
-			resType.Members.Add (ctor);
-			//constructor CustomAttributes
-			CodeAttributeDeclaration supMsgAt = new CodeAttributeDeclaration (
-										"System.Diagnostics.CodeAnalysis.SuppressMessageAttribute");
-			CodeAttributeArgument supMsgAtCat = new CodeAttributeArgument (
-										new CodePrimitiveExpression ("Microsoft.Performance"));
-			supMsgAt.Arguments.Add (supMsgAtCat);
-			CodeAttributeArgument supMsgAtRul = new CodeAttributeArgument (
-										new CodePrimitiveExpression ("CA1811:AvoidUncalledPrivateCode")); 
-			supMsgAt.Arguments.Add (supMsgAtRul);
-			ctor.CustomAttributes.Add (supMsgAt);
+
+			ctor.CustomAttributes.Add (new CodeAttributeDeclaration (
+						"System.Diagnostics.CodeAnalysis.SuppressMessageAttribute",
+						new CodeAttributeArgument (
+						new CodePrimitiveExpression ("Microsoft.Performance")),
+						new CodeAttributeArgument (
+						new CodePrimitiveExpression ("CA1811:AvoidUncalledPrivateCode"))));
+
+			return ctor;
+		}
+
+		static CodeAttributeDeclaration DefaultPropertyAttribute ()
+		{
+			// CustomAttributes for ResourceManager and Culture 
+			return new CodeAttributeDeclaration ("System.ComponentModel.EditorBrowsableAttribute",
+	                                                        new CodeAttributeArgument (
+								new CodeFieldReferenceExpression (
+								new CodeTypeReferenceExpression (
+								"System.ComponentModel.EditorBrowsableState"),
+								"Advanced")));
+
+		}
+
+		static CodeMemberProperty GenerateCultureProp (bool internalClass)
+		{
+			// Culture property
+			CodeMemberProperty cultureProp = GeneratePropertyBase ("Culture",
+			                                               typeof (System.Globalization.CultureInfo),
+			                                               internalClass,
+			                                               true,
+			                                               true);
 			
+			// attributes - same as ResourceManager
+			cultureProp.CustomAttributes.Add (DefaultPropertyAttribute ());
+
+			// getter
+			cultureProp.GetStatements.Add (new CodeMethodReturnStatement (
+							new CodeFieldReferenceExpression (
+							null,"resourceCulture")));
+
+			// setter
+			cultureProp.SetStatements.Add (new CodeAssignStatement (
+				new CodeFieldReferenceExpression (
+				null,"resourceCulture"),
+				new CodePropertySetValueReferenceExpression ()));
+
+			return cultureProp;
+		}
+
+		static CodeMemberProperty GenerateResourceManagerProp (string baseNameToUse, string resourcesToUse, bool internalClass)
+		{
 			// ResourceManager property
-			CodeMemberProperty resourceManagerProp = PropertyBase ("ResourceManager",
+			CodeMemberProperty resourceManagerProp = GeneratePropertyBase ("ResourceManager",
 			                                                       typeof (System.Resources.ResourceManager),
 			                                                       internalClass,
 			                                                       true,
 			                                                       false);
 
-			// attributes
-			// "System.ComponentModel.EditorBrowsableAttribute", "Advanced","System.ComponentModel.EditorBrowsableState"
-			CodeAttributeDeclaration editBrowseAt = new CodeAttributeDeclaration ("System.ComponentModel.EditorBrowsableAttribute",
-			                                                                new CodeAttributeArgument (
-											new CodeFieldReferenceExpression (
-											new CodeTypeReferenceExpression (
-											"System.ComponentModel.EditorBrowsableState"),
-											"Advanced")));
-			
-			resourceManagerProp.CustomAttributes.Add (editBrowseAt);
+			resourceManagerProp.CustomAttributes.Add (DefaultPropertyAttribute ());
 			// getter
 			
 			// true statments for check if resourceMan null to go inside getter
@@ -252,108 +376,15 @@ namespace System.Resources.Tools
 			
 			resourceManagerProp.GetStatements.Add (new CodeMethodReturnStatement ( 
 			                                       new CodeFieldReferenceExpression ( null,"resourceMan")));
-			
-			resType.Members.Add(resourceManagerProp);
 
-			// Culture property
-			CodeMemberProperty cultureProp = PropertyBase ("Culture",
-			                                               typeof (System.Globalization.CultureInfo),
-			                                               internalClass,
-			                                               true,
-			                                               true);
-			
-			// attributes - same as ResourceManager
-			cultureProp.CustomAttributes.Add (editBrowseAt);
-
-			// getter
-			cultureProp.GetStatements.Add (new CodeMethodReturnStatement (
-							new CodeFieldReferenceExpression (
-							null,"resourceCulture")));
-
-			// setter
-			cultureProp.SetStatements.Add (new CodeAssignStatement (
-				new CodeFieldReferenceExpression (
-				null,"resourceCulture"),
-				new CodePropertySetValueReferenceExpression ()));
-
-			resType.Members.Add (cultureProp);
-
-			// properties for resources
-			//FIXME: is it correct to use OrdinalIgnoreCase here?
-
-			Dictionary<string,ResourceItem> resourceItemDict;
-			resourceItemDict = new Dictionary<string,ResourceItem> (StringComparer.OrdinalIgnoreCase);
-
-			//allow ArgumentException to be raised if case insensitive dupes present
-			foreach (DictionaryEntry de in resourceList)
-				resourceItemDict.Add (de.Key.ToString (), new ResourceItem (de.Value));
-
-			foreach (KeyValuePair<string, ResourceItem> kvp in resourceItemDict) {
-				//ignore
-				if (kvp.Key.StartsWith(">>") || kvp.Key.StartsWith ("$")) {
-					kvp.Value.toIgnore = true;
-					continue;
-				}
-				//invalid names
-				if (kvp.Key == "ResourceManager" || kvp.Key == "Culture") {
-					kvp.Value.isUnmatchable = true;
-					continue;
-				}
-				// verify name
-				kvp.Value.VerifiedKey = VerifyResourceName (kvp.Key, codeProvider);
-				// null check
-				if (kvp.Value.VerifiedKey == null) {
-					kvp.Value.isUnmatchable = true;
-					continue;
-				}
-				//dupe check
-				foreach (KeyValuePair<string, ResourceItem> item in resourceItemDict) {
-					// skip on encountering kvp or if VerifiedKey on object null (ie hasnt been processed yet)
-					if (Object.ReferenceEquals (item.Value, kvp.Value)
-					    || item.Value.VerifiedKey == null)
-					    continue;
-					// if case insensitive dupe found mark both
-					if (item.Value.VerifiedKey.ToLower () == kvp.Value.VerifiedKey.ToLower ()) {
-						item.Value.isUnmatchable = true;
-						kvp.Value.isUnmatchable = true;
-					}
-				}
-			}
-
-			// either create properties for resources, ignore or add to unmatchableList
-			List<string> unmatchableList = new List<string> ();
-
-			foreach (KeyValuePair<string, ResourceItem> kvp in resourceItemDict) {
-				if (kvp.Value.isUnmatchable)
-					unmatchableList.Add (kvp.Key); // orig key
-				else if (!kvp.Value.toIgnore) {
-						if (kvp.Value.Resource is Stream)
-							resType.Members.Add (StreamProperty (kvp.Value.VerifiedKey,
-												kvp.Key,
-												internalClass));
-						else if (kvp.Value.Resource is String)
-							resType.Members.Add (StringProperty (kvp.Value.VerifiedKey,
-												kvp.Key,
-						                                     		internalClass));
-						else
-							resType.Members.Add (StandardProperty (kvp.Value.VerifiedKey,
-												kvp.Key,
-												kvp.Value.Resource.GetType (),
-												internalClass));
-				}
-			}
-
-
-			unmatchable = unmatchableList.ToArray ();
-
-			return ccu;
+			return resourceManagerProp;
 
 		}
 
-		static CodeMemberProperty StandardProperty (string propName, string resName, Type propertyType, bool isInternal)
+		static CodeMemberProperty GenerateStandardResourceProp (string propName, string resName, Type propertyType, bool isInternal)
 		{
 
-			CodeMemberProperty prop = PropertyBase (propName, propertyType, isInternal, true, false);
+			CodeMemberProperty prop = GeneratePropertyBase (propName, propertyType, isInternal, true, false);
 
 			prop.GetStatements.Add (new CodeVariableDeclarationStatement (
 						new CodeTypeReference ("System.Object"),
@@ -372,9 +403,9 @@ namespace System.Resources.Tools
 			return prop;
 		}
 
-		static CodeMemberProperty StringProperty (string propName, string resName, bool isInternal)
+		static CodeMemberProperty GenerateStringResourceProp (string propName, string resName, bool isInternal)
 		{
-			CodeMemberProperty prop = PropertyBase (propName, typeof (String), isInternal, true, false);
+			CodeMemberProperty prop = GeneratePropertyBase (propName, typeof (String), isInternal, true, false);
 
 			prop.GetStatements.Add (new CodeMethodReturnStatement (
 						new CodeMethodInvokeExpression (
@@ -387,9 +418,9 @@ namespace System.Resources.Tools
 			return prop;
 		}
 
-		static CodeMemberProperty StreamProperty (string propName, string resName, bool isInternal)
+		static CodeMemberProperty GenerateStreamResourceProp (string propName, string resName, bool isInternal)
 		{
-			CodeMemberProperty prop = PropertyBase (propName, typeof (UnmanagedMemoryStream), isInternal, true, false);
+			CodeMemberProperty prop = GeneratePropertyBase (propName, typeof (UnmanagedMemoryStream), isInternal, true, false);
 
 			prop.GetStatements.Add (new CodeMethodReturnStatement (
 						new CodeMethodInvokeExpression (
@@ -402,7 +433,7 @@ namespace System.Resources.Tools
 			return prop;
 		}
 
-		static CodeMemberProperty PropertyBase (string name, Type propertyType, bool isInternal, bool hasGet, bool hasSet)
+		static CodeMemberProperty GeneratePropertyBase (string name, Type propertyType, bool isInternal, bool hasGet, bool hasSet)
 		{
 			CodeMemberProperty prop = new CodeMemberProperty ();
 
