@@ -28,9 +28,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-using System.IO;
-
-
 #if NET_2_0
 
 using System.CodeDom;
@@ -39,6 +36,8 @@ using System.Collections;
 using System.ComponentModel.Design;
 using System.Reflection;
 using System.Collections.Generic;
+using System.IO;
+using System.Resources;
 
 namespace System.Resources.Tools
 {
@@ -53,17 +52,22 @@ namespace System.Resources.Tools
 						'*', '+', '-', '/', '\\', '<', '>', '?', '[', ']', '(', ')', '{', 
 						'}', '\"', '\'', '!'};
 
-		//[MonoTODO]
 		public static CodeCompileUnit Create (string resxFile,
 						      string baseName,
 						      string generatedCodeNamespace,
 						      CodeDomProvider codeProvider, bool internalClass,
 						      out string [] unmatchable)
 		{
-			throw new NotImplementedException ();
+			
+			return Create (resxFile,
+			               baseName,
+			               generatedCodeNamespace,
+			               null,
+			               codeProvider,
+			               internalClass,
+			               out unmatchable);
 		}
 
-		//[MonoTODO]
 		public static CodeCompileUnit Create (string resxFile,
 						      string baseName,
 						      string generatedCodeNamespace,
@@ -71,20 +75,54 @@ namespace System.Resources.Tools
 						      CodeDomProvider codeProvider, bool internalClass,
 						      out string [] unmatchable)
 		{
-			throw new NotImplementedException ();
+			// unpack resfile into dictionary, pass to overload
+
+			// validate resxFile
+			if (resxFile == null)
+				throw new ArgumentNullException ("Parameter resxFile must not be null");
+			//FIXME: is this ok for an illegal char check, note im checking filename as well as path
+			char[] invalidPathChars = Path.GetInvalidPathChars ();
+			foreach (char c in resxFile.ToCharArray ()) {
+				foreach (char invalid in invalidPathChars) {
+					if (c == invalid)
+						throw new ArgumentException ("Invalid character in resxFileName");
+				}
+			}
+
+			Dictionary<string,object> resourcesList = new Dictionary<string,object> ();
+
+			using (ResXResourceReader reader = new ResXResourceReader (resxFile)) {
+
+				foreach (DictionaryEntry d in reader)
+					resourcesList.Add ((string) d.Key, d.Value);	
+			}
+
+			return Create (resourcesList,
+			               baseName,
+			               generatedCodeNamespace,
+			               resourcesNamespace,
+			               codeProvider,
+			               internalClass,
+			               out unmatchable);
+
 		}
 
-		//[MonoTODO]
 		public static CodeCompileUnit Create (IDictionary resourceList,
 						      string baseName,
 						      string generatedCodeNamespace,
 						      CodeDomProvider codeProvider, bool internalClass,
 						      out string [] unmatchable)
 		{
-			throw new NotImplementedException ();
+			
+			return Create (resourceList, 
+			               baseName, 
+			               generatedCodeNamespace, 
+			               null, 
+			               codeProvider, 
+			               internalClass, 
+			               out unmatchable);
 		}
 
-		//[MonoTODO]
 		public static CodeCompileUnit Create (IDictionary resourceList, 
 						      string baseName,
 						      string generatedCodeNamespace,
@@ -131,22 +169,26 @@ namespace System.Resources.Tools
 			Dictionary<string,ResourceItem> resourceItemDict;
 			resourceItemDict = new Dictionary<string,ResourceItem> (StringComparer.OrdinalIgnoreCase);
 
-			//allow ArgumentException to be raised if case insensitive dupes present
+			//allow ArgumentException to be raised on case insensitive dupes,InvalidCastException on key not being string
 			foreach (DictionaryEntry de in resourceList)
-				resourceItemDict.Add (de.Key.ToString (), new ResourceItem (de.Value));
+				resourceItemDict.Add ((string) de.Key, new ResourceItem (de.Value));
 
 			ProcessResourceList (resourceItemDict, codeProvider);
 
 			// Generate CodeDOM
-			CodeCompileUnit ccu = GenerateCodeDOMBase (baseNameToUse, generatedCodeNamespaceToUse, resourcesToUse, internalClass);
+			CodeCompileUnit ccu = GenerateCodeDOMBase (baseNameToUse, generatedCodeNamespaceToUse, 
+			                                           resourcesToUse, internalClass);
 
 			// add properties for resources
-			unmatchable = ResourcePropertyGeneration (ccu.Namespaces [0].Types [0], resourceItemDict, internalClass);
+			unmatchable = ResourcePropertyGeneration (ccu.Namespaces [0].Types [0], 
+			                                          resourceItemDict, internalClass);
 
 			return ccu;
 		}
 
-		static string[] ResourcePropertyGeneration (CodeTypeDeclaration resType, Dictionary<string, ResourceItem> resourceItemDict, bool internalClass)
+		static string[] ResourcePropertyGeneration (CodeTypeDeclaration resType, 
+		                                            Dictionary<string, ResourceItem> resourceItemDict, 
+		                                            bool internalClass)
 		{
 			// either create properties for resources, ignore or add to unmatchableList
 			List<string> unmatchableList = new List<string> ();
@@ -157,17 +199,17 @@ namespace System.Resources.Tools
 				else if (!kvp.Value.toIgnore) {
 						if (kvp.Value.Resource is Stream)
 							resType.Members.Add (GenerateStreamResourceProp (kvp.Value.VerifiedKey,
-												kvp.Key,
-												internalClass));
+													kvp.Key,
+													internalClass));
 						else if (kvp.Value.Resource is String)
 							resType.Members.Add (GenerateStringResourceProp (kvp.Value.VerifiedKey,
-												kvp.Key,
-						                                     		internalClass));
+													kvp.Key,
+													internalClass));
 						else
 							resType.Members.Add (GenerateStandardResourceProp (kvp.Value.VerifiedKey,
-												kvp.Key,
-												kvp.Value.Resource.GetType (),
-												internalClass));
+													kvp.Key,
+													kvp.Value.Resource.GetType (),
+													internalClass));
 				}
 			}
 
@@ -198,7 +240,8 @@ namespace System.Resources.Tools
 			return ccu;
 		}
 
-		static void ProcessResourceList (Dictionary<string, ResourceItem> resourceItemDict, CodeDomProvider codeProvider)
+		static void ProcessResourceList (Dictionary<string, ResourceItem> resourceItemDict, 
+		                                 CodeDomProvider codeProvider)
 		{
 			foreach (KeyValuePair<string, ResourceItem> kvp in resourceItemDict) {
 				//deal with ignored keys
@@ -310,7 +353,6 @@ namespace System.Resources.Tools
 								new CodeTypeReferenceExpression (
 								"System.ComponentModel.EditorBrowsableState"),
 								"Advanced")));
-
 		}
 
 		static CodeMemberProperty GenerateCultureProp (bool internalClass)
@@ -339,7 +381,8 @@ namespace System.Resources.Tools
 			return cultureProp;
 		}
 
-		static CodeMemberProperty GenerateResourceManagerProp (string baseNameToUse, string resourcesToUse, bool internalClass)
+		static CodeMemberProperty GenerateResourceManagerProp (string baseNameToUse, string resourcesToUse, 
+		                                                       bool internalClass)
 		{
 			// ResourceManager property
 			CodeMemberProperty resourceManagerProp = GeneratePropertyBase ("ResourceManager",
@@ -358,10 +401,12 @@ namespace System.Resources.Tools
 										new CodeTypeReference (
 										"System.Resources.ResourceManager"),
 				                                                "temp", new CodeObjectCreateExpression (
-										new CodeTypeReference ("System.Resources.ResourceManager"),
+										new CodeTypeReference (
+										"System.Resources.ResourceManager"),
 										new CodePrimitiveExpression (resourcesToUse),
 										new CodePropertyReferenceExpression (
-										new CodeTypeOfExpression (baseNameToUse),"Assembly")));
+										new CodeTypeOfExpression (baseNameToUse),
+										"Assembly")));
 
 			trueStatements [1] = new CodeAssignStatement ( new CodeFieldReferenceExpression (null, "resourceMan"),
 			                                              new CodeVariableReferenceExpression ("temp"));
@@ -381,7 +426,8 @@ namespace System.Resources.Tools
 
 		}
 
-		static CodeMemberProperty GenerateStandardResourceProp (string propName, string resName, Type propertyType, bool isInternal)
+		static CodeMemberProperty GenerateStandardResourceProp (string propName, string resName, 
+		                                                        Type propertyType, bool isInternal)
 		{
 
 			CodeMemberProperty prop = GeneratePropertyBase (propName, propertyType, isInternal, true, false);
@@ -420,7 +466,8 @@ namespace System.Resources.Tools
 
 		static CodeMemberProperty GenerateStreamResourceProp (string propName, string resName, bool isInternal)
 		{
-			CodeMemberProperty prop = GeneratePropertyBase (propName, typeof (UnmanagedMemoryStream), isInternal, true, false);
+			CodeMemberProperty prop = GeneratePropertyBase (propName, typeof (UnmanagedMemoryStream), 
+			                                                isInternal, true, false);
 
 			prop.GetStatements.Add (new CodeMethodReturnStatement (
 						new CodeMethodInvokeExpression (
@@ -433,7 +480,8 @@ namespace System.Resources.Tools
 			return prop;
 		}
 
-		static CodeMemberProperty GeneratePropertyBase (string name, Type propertyType, bool isInternal, bool hasGet, bool hasSet)
+		static CodeMemberProperty GeneratePropertyBase (string name, Type propertyType, bool isInternal, 
+		                                                bool hasGet, bool hasSet)
 		{
 			CodeMemberProperty prop = new CodeMemberProperty ();
 
@@ -456,7 +504,6 @@ namespace System.Resources.Tools
 			return prop;
 		}
 
-		//[MonoTODO]
 		public static string VerifyResourceName (string key, CodeDomProvider provider)
 		{
 			string keyToUse;

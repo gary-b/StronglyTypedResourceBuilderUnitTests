@@ -244,6 +244,25 @@ namespace StronglyTypedResourceBuilderTests {
 			Assert.AreEqual (1,unmatchables.Length);
 			Assert.AreEqual (7,ccu.Namespaces [0].Types [0].Members.Count);	// 5 standard +2
 		}
+
+		[Test, ExpectedException (typeof (InvalidCastException))]
+		public void ResourceNamesNotString ()
+		{
+			// throws InvalidCastException in .net framework
+			Dictionary<object, object> testResources = new Dictionary<object, object> ();
+			string [] unmatchables;
+			
+			testResources.Add (DateTime.MinValue, "1");
+			
+			StronglyTypedResourceBuilder.Create (testResources,
+								"TestRes",
+								"TestNamespace",
+								"TestResourcesNameSpace",
+								provider,
+								true,
+								out unmatchables);
+			
+		}
 		
 	}
 }
