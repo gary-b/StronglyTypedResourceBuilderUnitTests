@@ -3,7 +3,7 @@
 //
 // Author:
 //	Atsushi Enomoto (atsushi@ximian.com)
-//  	Gary B (2012)
+//  	Gary Barnett (2012)
 // 
 // Copyright (C) 2007 Novell, Inc.
 //
