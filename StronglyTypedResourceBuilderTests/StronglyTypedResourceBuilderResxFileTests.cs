@@ -28,7 +28,7 @@ namespace StronglyTypedResourceBuilderTests {
 								true,
 								out unmatchables);
 		}
-		
+		/* FIXME: need platform dependant check, (file returns not found if invalid anyway)
 		[Test, ExpectedException (typeof (ArgumentException))]
 		public void ResXFilenameInvalid ()
 		{
@@ -45,7 +45,7 @@ namespace StronglyTypedResourceBuilderTests {
 								true,
 								out unmatchables);
 		}
-		
+		*/
 		[Test, ExpectedException (typeof (ArgumentNullException))]
 		public void ResXFilenameNull ()
 		{
