@@ -7,7 +7,7 @@ using System.CodeDom;
 using System.Resources;
 using System.Drawing;
 
-namespace StronglyTypedResourceBuilderTests {
+namespace MonoTests.System.Resources.Tools {
 	[TestFixture]
 	public class StronglyTypedResourceBuilderResxFileTests 	{	
 		CSharpCodeProvider provider = new CSharpCodeProvider ();

@@ -8,7 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Drawing;
 
-namespace StronglyTypedResourceBuilderTests {
+namespace MonoTests.System.Resources.Tools {
 	[TestFixture]
 	public class StronglyTypedResourceBuilderOtherTests	{
 		CSharpCodeProvider provider = new CSharpCodeProvider ();

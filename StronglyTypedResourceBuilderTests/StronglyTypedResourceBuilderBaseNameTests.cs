@@ -5,7 +5,7 @@ using System.CodeDom;
 using Microsoft.CSharp;
 using System.Collections.Generic;
 
-namespace StronglyTypedResourceBuilderTests {
+namespace MonoTests.System.Resources.Tools {
 	[TestFixture]
 	public class StronglyTypedResourceBuilderBaseNameTests	{
 		static string [] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 

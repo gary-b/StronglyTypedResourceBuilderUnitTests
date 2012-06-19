@@ -3,7 +3,7 @@ using System;
 using System.Resources.Tools;
 using Microsoft.CSharp;
 
-namespace StronglyTypedResourceBuilderTests {
+namespace MonoTests.System.Resources.Tools {
 	[TestFixture]
 	public class StronglyTypedResourceBuilderVerifyResourceNameTests {
 		static string [] keywords = {"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", 

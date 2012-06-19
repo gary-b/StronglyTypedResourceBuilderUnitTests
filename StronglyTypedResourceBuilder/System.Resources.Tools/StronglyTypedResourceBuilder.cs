@@ -80,7 +80,7 @@ namespace System.Resources.Tools
 			// validate resxFile
 			if (resxFile == null)
 				throw new ArgumentNullException ("Parameter resxFile must not be null");
-			//FIXME: is this ok for an illegal char check, note im checking filename as well as path
+			//FIXME: is this ok for an illegal char check? note im checking filename as well as path
 			char[] invalidPathChars = Path.GetInvalidPathChars ();
 			foreach (char c in resxFile.ToCharArray ()) {
 				foreach (char invalid in invalidPathChars) {

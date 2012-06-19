@@ -5,7 +5,7 @@ using System.CodeDom;
 using Microsoft.CSharp;
 using System.Collections.Generic;
 
-namespace StronglyTypedResourceBuilderTests {
+namespace MonoTests.System.Resources.Tools {
 	[TestFixture]
 	public class StronglyTypedResourceBuilderResourceNameTests	{
 		CSharpCodeProvider provider = new CSharpCodeProvider ();
